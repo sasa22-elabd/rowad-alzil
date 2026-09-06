@@ -1,0 +1,8 @@
+// 1) ضيف الاستيراد ده مع باقي الـ requires فوق:
+const settingRoutes = require("./routes/settingRoutes");
+
+// 2) ضيف السطر ده مع باقي app.use بتاعت الـ API:
+app.use("/api/settings", settingRoutes);
+
+// 3) لازم تضيف موديل Setting في models/index.js بتاعك زي باقي الموديلات
+// (Category, Product, Article...) عشان الاستيراد { Setting } في الكنترولر يشتغل.

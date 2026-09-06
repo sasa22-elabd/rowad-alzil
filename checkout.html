@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إتمام الطلب | رواد الظل</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dark-mode.css">
+
+    <style>
+        .checkout-page {
+            font-family: 'Cairo', sans-serif;
+            direction: rtl;
+            padding: 140px 24px 100px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .checkout-page h1 {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .checkout-wrap {
+            display: grid;
+            grid-template-columns: 1.3fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        @media (max-width: 860px) {
+            .checkout-wrap { grid-template-columns: 1fr; }
+        }
+
+        .checkout-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 26px;
+            box-shadow: 0 3px 14px rgba(0,0,0,0.06);
+        }
+
+        .checkout-card h2 {
+            font-size: 18px;
+            font-weight: 800;
+            margin: 0 0 18px;
+        }
+
+        .form-row {
+            margin-bottom: 16px;
+        }
+
+        .form-row label {
+            display: block;
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 7px;
+            color: #333;
+        }
+
+        .form-row input,
+        .form-row textarea,
+        .form-row select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #e2e2e2;
+            border-radius: 10px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 14px;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .form-row input:focus,
+        .form-row textarea:focus,
+        .form-row select:focus {
+            border-color: #b8860b;
+        }
+
+        .form-row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        @media (max-width: 480px) {
+            .form-row-2 { grid-template-columns: 1fr; }
+        }
+
+        .field-error {
+            color: #d64545;
+            font-size: 12.5px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .form-row.has-error input,
+        .form-row.has-error textarea {
+            border-color: #d64545;
+        }
+
+        .form-row.has-error .field-error {
+            display: block;
+        }
+
+        /* طرق الدفع */
+        .payment-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .payment-option {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            border: 2px solid #e2e2e2;
+            border-radius: 12px;
+            padding: 14px 16px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .payment-option.selected {
+            border-color: #b8860b;
+            background: #fff9ee;
+        }
+
+        .payment-option input[type="radio"] {
+            width: auto;
+            margin-top: 3px;
+        }
+
+        .payment-option-info strong {
+            display: block;
+            font-size: 14.5px;
+            margin-bottom: 3px;
+        }
+
+        .payment-option-info span {
+            font-size: 12.5px;
+            color: #888;
+        }
+
+        .payment-details-box {
+            display: none;
+            background: #fff6e6;
+            border-radius: 10px;
+            padding: 14px;
+            margin-top: 12px;
+            font-size: 13.5px;
+            line-height: 1.9;
+            color: #7a5a00;
+        }
+
+        .payment-details-box.show {
+            display: block;
+        }
+
+        .payment-details-box strong {
+            color: #b8860b;
+        }
+
+        /* ملخص الطلب */
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 13.5px;
+        }
+
+        .summary-item img {
+            width: 46px;
+            height: 46px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: #f4f4f4;
+        }
+
+        .summary-item-name {
+            flex: 1;
+        }
+
+        .summary-item-name strong {
+            display: block;
+            font-size: 13.5px;
+        }
+
+        .summary-item-name small {
+            color: #999;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            margin-top: 12px;
+            color: #555;
+        }
+
+        .summary-total-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 19px;
+            font-weight: 800;
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .checkout-submit-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 50px;
+            background: #1a1a1a;
+            color: #fff;
+            font-weight: 700;
+            font-size: 15.5px;
+            cursor: pointer;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: opacity 0.2s;
+        }
+
+        .checkout-submit-btn:hover { opacity: 0.9; }
+        .checkout-submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .checkout-whatsapp-note {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 12px;
+            font-size: 13px;
+            color: #25D366;
+            font-weight: 700;
+        }
+
+        .checkout-empty {
+            text-align: center;
+            padding: 80px 20px;
+            color: #9aa1a8;
+        }
+
+        .checkout-empty a {
+            display: inline-block;
+            margin-top: 14px;
+            color: #b8860b;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .checkout-success {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .checkout-success i {
+            font-size: 60px;
+            color: #16a34a;
+            margin-bottom: 20px;
+        }
+
+        .checkout-success h2 {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .checkout-success p {
+            color: #666;
+            margin-bottom: 24px;
+        }
+
+        .checkout-success .success-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .checkout-success .success-actions a {
+            padding: 13px 26px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .success-btn-whatsapp {
+            background: #25D366;
+            color: #fff;
+        }
+
+        .success-btn-home {
+            background: #1a1a1a;
+            color: #fff;
+        }
+
+        .form-error-banner {
+            display: none;
+            background: #fdecec;
+            color: #d64545;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 13.5px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        .checkout-success .success-actions a {
+    padding: 13px 26px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 14px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    white-space: nowrap;   /* يمنع النص يتكسر */
+    width: auto;           /* يمنع أي عرض ثابت بيجي من مكان تاني */
+    height: auto;
+    min-width: max-content;
+    flex: none;            /* يمنع الفليكس يضغطه دايرة */
+}
+
+.success-btn-whatsapp {
+    background: #25D366;
+    color: #fff;
+}
+
+.success-btn-home {
+    background: #1a1a1a;
+    color: #fff;
+}
+    </style>
+</head>
+
+<body>
+
+<header class="site-header">
+    <div class="header-container">
+        <a href="index.html" class="brand-logo">
+            <img src="images/logo.png" data-settings-logo alt="رواد الظل">
+        </a>
+        <nav class="main-nav">
+            <a href="index.html" class="nav-link">الرئيسية</a>
+            <a href="store.html" class="nav-link">المتجر</a>
+            <a href="cart.html" class="nav-link cart-badge">
+                <i class="fa-solid fa-cart-shopping cart-icon"></i>
+                <span class="cart-text">سلة المشتريات</span>
+                <span class="cart-count" id="cartCountBadge" style="display:none;">0</span>
+            </a>
+        </nav>
+        <a href="tel:+201000000000" data-settings-href="tel:phoneIntl" class="header-contact">كلّمنا الآن</a>
+        <button class="mobile-menu-btn" aria-label="فتح القائمة">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+    </div>
+</header>
+
+<div class="mobile-nav" id="mobileNav">
+    <div class="mobile-nav-head">
+        <img src="images/logo.png" data-settings-logo alt="رواد الظل">
+        <button id="mobileClose"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <nav>
+        <a href="index.html">الرئيسية</a>
+        <a href="store.html">المتجر</a>
+        <a href="cart.html">سلة المشتريات</a>
+    </nav>
+</div>
+
+<main class="checkout-page" dir="rtl">
+    <h1>إتمام الطلب</h1>
+    <div id="checkoutContainer">
+        <div style="text-align:center;color:#9aa1a8;padding:60px 0;">جاري التحميل...</div>
+    </div>
+</main>
+
+<footer class="rz-footer" dir="rtl">
+    <div class="rz-footer-container">
+        <div class="rz-footer-right">
+            <a href="/" class="rz-footer-logo">
+                <div class="rz-logo-text">
+                    <strong>رواد الظل</strong>
+                    <small>ROAD ALZILL</small>
+                </div>
+            </a>
+        </div>
+        <div class="rz-footer-center">
+            <div class="rz-copyright">
+                جميع الحقوق محفوظة لشركة <strong>رواد الظل</strong> © 2026
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="script.js"></script>
+<script src="cart.js"></script>
+<script src="dark-mode.js"></script>
+<script src="checkout.js"></script>
+<script src="settings-loader.js"></script>
+</body>
+</html>

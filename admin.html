@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>لوحة تحكم رواد الظل</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<!-- ============== LOGIN SCREEN ============== -->
+<div class="login-screen" id="loginScreen">
+
+    <form class="login-box" id="loginForm">
+
+        <h1>لوحة تحكم رواد الظل</h1>
+        <p>سجل دخولك للمتابعة</p>
+
+        <label>البريد الإلكتروني</label>
+        <input type="email" id="loginEmail" required placeholder="admin@rowadalthil.com">
+
+        <label>كلمة المرور</label>
+        <input type="password" id="loginPassword" required placeholder="••••••••">
+
+        <button type="submit">دخول</button>
+
+        <div class="login-error" id="loginError"></div>
+
+    </form>
+
+</div>
+
+
+<!-- ============== DASHBOARD ============== -->
+<div class="dashboard" id="dashboard" style="display:none;">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+            <strong>رواد الظل</strong>
+            <span>لوحة التحكم</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <button class="nav-btn active" data-tab="products">
+                <i class="fa-solid fa-box"></i> المنتجات
+            </button>
+            <button class="nav-btn" data-tab="categories">
+                <i class="fa-solid fa-tags"></i> التصنيفات
+            </button>
+            <button class="nav-btn" data-tab="articles">
+                <i class="fa-solid fa-newspaper"></i> المقالات
+            </button>
+            <button class="nav-btn" data-tab="projects">
+    <i class="fa-solid fa-briefcase"></i> أعمالنا
+</button>
+            <button class="nav-btn" data-tab="services">
+    <i class="fa-solid fa-screwdriver-wrench"></i> خدماتنا
+</button>
+<button class="nav-btn" data-tab="settings">
+    <i class="fa-solid fa-gear"></i> الإعدادات العامة
+</button>
+ <button class="nav-btn" data-tab="hero">
+    <i class="fa-solid fa-images"></i> السلايدر الرئيسي
+</button>
+ <button class="nav-btn" data-tab="orders" style="position:relative;">
+    <i class="fa-solid fa-receipt"></i> الطلبات
+    <span class="nav-badge" id="ordersNavBadge" style="display:none;">0</span>
+</button>
+ <button
+    class="nav-btn"
+    data-tab="work-sections"
+>
+    <i class="fa-solid fa-layer-group"></i>
+    <span>مجالات أعمالنا</span>
+</button>
+        </nav>
+
+        <button class="logout-btn" id="logoutBtn">
+            <i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج
+        </button>
+
+    </aside>
+
+
+    <!-- MAIN -->
+    <main class="main-panel">
+
+        <!-- ===== PRODUCTS TAB ===== -->
+        <section class="tab-panel active" id="tab-products">
+
+            <div class="panel-header">
+                <h2>المنتجات</h2>
+                <button class="btn-primary" id="openAddProduct">
+                    <i class="fa-solid fa-plus"></i> إضافة منتج
+                </button>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>الصورة</th>
+                            <th>الاسم</th>
+                            <th>التصنيف</th>
+                            <th>السعر</th>
+                            <th>الحالة</th>
+                            <th>إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsTableBody"></tbody>
+                </table>
+            </div>
+
+            <div class="pagination" id="productsPagination"></div>
+
+        </section>
+
+
+        <!-- ===== CATEGORIES TAB ===== -->
+        <section class="tab-panel" id="tab-categories">
+
+            <div class="panel-header">
+                <h2>التصنيفات</h2>
+                <button class="btn-primary" id="openAddCategory">
+                    <i class="fa-solid fa-plus"></i> إضافة تصنيف
+                </button>
+            </div>
+
+            <div class="cards-grid" id="categoriesGrid"></div>
+
+        </section>
+
+
+        <!-- ===== ARTICLES TAB ===== -->
+        <section class="tab-panel" id="tab-articles">
+
+            <div class="panel-header">
+                <h2>المقالات</h2>
+                <button class="btn-primary" id="openAddArticle">
+                    <i class="fa-solid fa-plus"></i> إضافة مقال
+                </button>
+            </div>
+
+            <div class="products-toolbar">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="articlesSearchInput" placeholder="ابحث بعنوان المقال...">
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>الصورة</th>
+                            <th>العنوان</th>
+                            <th>التصنيف</th>
+                            <th>التاريخ</th>
+                            <th>الحالة</th>
+                            <th>إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="articlesTableBody"></tbody>
+                </table>
+            </div>
+
+            <div class="pagination" id="articlesPagination"></div>
+
+        </section>
+<!-- ===== PROJECTS TAB ===== -->
+<section class="tab-panel" id="tab-projects">
+
+    <div class="panel-header">
+        <h2>أعمالنا</h2>
+        <button class="btn-primary" id="openAddProject">
+            <i class="fa-solid fa-plus"></i> إضافة عمل
+        </button>
+    </div>
+
+    <div class="cards-grid" id="projectsGrid"></div>
+
+</section>
+<section class="tab-panel" id="tab-settings">
+ 
+    <div class="panel-header">
+        <h2>الإعدادات العامة</h2>
+    </div>
+ 
+    <form id="settingsForm" class="settings-grid">
+ 
+        <!-- ============ كارت اللوجو (الداخلي) ============ -->
+        <div class="settings-card settings-card-logo">
+ 
+            <h3><i class="fa-solid fa-image"></i> شعار الموقع</h3>
+
+            <p style="font-size:12px;color:#888;margin:-8px 0 14px;">
+                ده اللوجو اللي بيظهر جوه صفحات الموقع نفسها (الهيدر، الفوتر).
+            </p>
+ 
+            <label class="logo-dropzone" for="settingsLogo">
+ 
+                <img id="settingsLogoPreview" class="logo-preview-img" style="display:none;">
+ 
+                <div class="logo-placeholder" id="settingsLogoPlaceholder">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <span>اضغط لرفع الشعار</span>
+                    <small>PNG / JPG — يفضل خلفية شفافة</small>
+                </div>
+ 
+            </label>
+ 
+            <input type="file" id="settingsLogo" accept="image/*" hidden>
+ 
+        </div>
+
+
+        <!-- ============ كارت اللوجو الخارجي ============ -->
+        <div class="settings-card settings-card-logo">
+
+            <h3><i class="fa-solid fa-share-nodes"></i> لوجو الموقع الخارجي</h3>
+
+            <p style="font-size:12px;color:#888;margin:-8px 0 14px;">
+                ده اللوجو اللي بيظهر كأيقونة تبويب المتصفح (Favicon)، وفي نتائج
+                جوجل، ولما حد يشارك رابط الموقع على واتساب/فيسبوك. يفضل يكون
+                صورة مربّعة وخلفيتها غير شفافة.
+            </p>
+
+            <label class="logo-dropzone" for="settingsLogoExternal">
+
+                <img id="settingsLogoExternalPreview" class="logo-preview-img" style="display:none;">
+
+                <div class="logo-placeholder" id="settingsLogoExternalPlaceholder">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <span>اضغط لرفع اللوجو الخارجي</span>
+                    <small>PNG مربّع — مقاس مقترح 512×512</small>
+                </div>
+
+            </label>
+
+            <input type="file" id="settingsLogoExternal" accept="image/*" hidden>
+
+        </div>
+ 
+ 
+        <!-- ============ كارت بيانات الشركة ============ -->
+        <div class="settings-card">
+ 
+            <h3><i class="fa-solid fa-building"></i> بيانات الشركة</h3>
+ 
+            <div class="settings-field">
+                <label>اسم الشركة (عربي)</label>
+                <input type="text" id="settingsSiteName" placeholder="رواد الظل">
+            </div>
+ 
+            <div class="settings-field">
+                <label>اسم الشركة (إنجليزي)</label>
+                <input type="text" id="settingsSiteNameEn" placeholder="ROAD ALZILL" dir="ltr">
+            </div>
+ 
+            <div class="settings-field">
+                <label>العنوان</label>
+                <input type="text" id="settingsAddress" placeholder="مصر - القاهرة">
+            </div>
+ 
+        </div>
+ 
+ 
+        <!-- ============ كارت بيانات التواصل ============ -->
+        <div class="settings-card">
+ 
+            <h3><i class="fa-solid fa-headset"></i> بيانات التواصل</h3>
+ 
+            <div class="settings-field">
+                <label>رقم الهاتف (للعرض)</label>
+                <div class="input-icon">
+                    <i class="fa-solid fa-phone"></i>
+                    <input type="text" id="settingsPhone" placeholder="01000000000" dir="ltr">
+                </div>
+            </div>
+ 
+            <div class="settings-field">
+                <label>رقم الهاتف الدولي (رابط الاتصال)</label>
+                <div class="input-icon">
+                    <i class="fa-solid fa-phone-flip"></i>
+                    <input type="text" id="settingsPhoneIntl" placeholder="+201000000000" dir="ltr">
+                </div>
+            </div>
+ 
+            <div class="settings-field">
+                <label>رقم الواتساب (دولي بدون +)</label>
+                <div class="input-icon">
+                    <i class="fa-brands fa-whatsapp"></i>
+                    <input type="text" id="settingsWhatsapp" placeholder="201000000000" dir="ltr">
+                </div>
+            </div>
+ 
+            <div class="settings-field">
+                <label>البريد الإلكتروني</label>
+                <div class="input-icon">
+                    <i class="fa-solid fa-envelope"></i>
+                    <input type="email" id="settingsEmail" placeholder="info@roadalzill.com" dir="ltr">
+                </div>
+            </div>
+ 
+        </div>
+ 
+ 
+        <!-- ============ كارت السوشيال ميديا ============ -->
+        <div class="settings-card">
+ 
+            <h3><i class="fa-solid fa-share-nodes"></i> روابط التواصل الاجتماعي</h3>
+ 
+            <div class="settings-field">
+                <label>فيسبوك</label>
+                <div class="input-icon">
+                    <i class="fa-brands fa-facebook-f"></i>
+                    <input type="text" id="settingsFacebook" placeholder="https://facebook.com/..." dir="ltr">
+                </div>
+            </div>
+ 
+            <div class="settings-field">
+                <label>انستجرام</label>
+                <div class="input-icon">
+                    <i class="fa-brands fa-instagram"></i>
+                    <input type="text" id="settingsInstagram" placeholder="https://instagram.com/..." dir="ltr">
+                </div>
+            </div>
+ 
+            <div class="settings-field">
+                <label>X (تويتر)</label>
+                <div class="input-icon">
+                    <i class="fa-brands fa-x-twitter"></i>
+                    <input type="text" id="settingsTwitter" placeholder="https://x.com/..." dir="ltr">
+                </div>
+            </div>
+ 
+            <div class="settings-field">
+                <label>لينكدإن</label>
+                <div class="input-icon">
+                    <i class="fa-brands fa-linkedin-in"></i>
+                    <input type="text" id="settingsLinkedin" placeholder="https://linkedin.com/..." dir="ltr">
+                </div>
+            </div>
+ 
+        </div>
+ 
+ 
+        <!-- ============ زرار الحفظ + رسالة الخطأ ============ -->
+        <div class="settings-save-bar">
+            <div class="form-error" id="settingsFormError"></div>
+            <button type="submit" class="btn-primary settings-save-btn">
+                <i class="fa-solid fa-floppy-disk"></i>
+                حفظ الإعدادات
+            </button>
+        </div>
+ 
+    </form>
+ 
+</section>
+ <section class="tab-panel" id="tab-hero">
+ 
+    <div class="panel-header">
+        <h2>السلايدر الرئيسي (فيديو الصفحة الرئيسية)</h2>
+        <button class="btn-primary" id="openAddHeroSlide">
+            <i class="fa-solid fa-plus"></i> إضافة سلايد
+        </button>
+    </div>
+ 
+    <div class="cards-grid" id="heroSlidesGrid"></div>
+ 
+</section>
+ 
+
+<!-- ===== SERVICES TAB ===== -->
+<section class="tab-panel" id="tab-services">
+
+    <div class="panel-header">
+        <h2>خدماتنا المتخصصة</h2>
+        <button class="btn-primary" id="openAddService">
+            <i class="fa-solid fa-plus"></i> إضافة خدمة
+        </button>
+    </div>
+
+    <div class="cards-grid" id="servicesGrid"></div>
+
+</section>
+<section class="tab-panel" id="tab-orders">
+ 
+    <div class="panel-header">
+        <h2>الطلبات</h2>
+    </div>
+ 
+    <div class="products-toolbar">
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="ordersSearchInput" placeholder="ابحث بالاسم أو رقم التليفون...">
+        </div>
+ 
+        <select id="ordersStatusFilter" class="status-filter-select">
+            <option value="">كل الحالات</option>
+            <option value="pending">قيد الانتظار</option>
+            <option value="confirmed">مؤكد</option>
+            <option value="shipping">جاري الشحن</option>
+            <option value="completed">مكتمل</option>
+            <option value="cancelled">ملغي</option>
+        </select>
+    </div>
+ 
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>رقم الطلب</th>
+                    <th>العميل</th>
+                    <th>التليفون</th>
+                    <th>الإجمالي</th>
+                    <th>الدفع</th>
+                    <th>الحالة</th>
+                    <th>التاريخ</th>
+                    <th>إجراءات</th>
+                </tr>
+            </thead>
+            <tbody id="ordersTableBody"></tbody>
+        </table>
+    </div>
+ 
+    <div class="pagination" id="ordersPagination"></div>
+ 
+</section>
+ <!-- ===== WORK SECTIONS TAB ===== -->
+<!-- ===== WORK SECTIONS TAB ===== -->
+<section class="tab-panel" id="tab-work-sections">
+
+    <div class="work-admin-header">
+        <div>
+            <span class="work-admin-kicker">إدارة المحتوى</span>
+            <h2>مجالات أعمالنا</h2>
+            <p>أضف وعدّل أقسام الأعمال والمعارض الخاصة بكل قسم</p>
+        </div>
+
+        <button type="button" id="openAddWorkSection" class="work-admin-add-btn">
+            <i class="fa-solid fa-plus"></i>
+            <span>إضافة قسم جديد</span>
+        </button>
+    </div>
+
+    <div id="workSectionsAdminGrid" class="work-admin-grid"></div>
+
+</section>
+
+
+<!-- ============== WORK SECTION MODAL ============== -->
+<div class="modal" id="workSectionModal">
+    <div class="modal-box modal-box-wide">
+
+        <button class="modal-close" data-close="workSectionModal">×</button>
+
+        <h3 id="workSectionModalTitle">إضافة قسم جديد</h3>
+
+        <form id="workSectionForm">
+
+            <input type="hidden" id="workSectionId">
+
+            <label>عنوان القسم</label>
+            <input type="text" id="workSectionTitle" required placeholder="مثال: مظلات وسواتر">
+
+            <label>رابط القسم (Slug) — بيتولّد تلقائي وممكن تعدّله</label>
+            <input type="text" id="workSectionSlug" placeholder="mazalla-sawater" dir="ltr">
+
+            <label>وصف قصير (يظهر في الكارت)</label>
+            <textarea id="workSectionShortDescription" rows="2"></textarea>
+
+            <label>الوصف الكامل</label>
+            <textarea id="workSectionDescription" rows="4"></textarea>
+
+            <label>ترتيب الظهور (رقم أصغر يظهر الأول)</label>
+            <input type="number" id="workSectionOrder" value="0">
+
+            <label>صورة القسم الرئيسية</label>
+            <input type="file" id="workSectionImage" accept="image/*">
+            <img id="workSectionImagePreview" class="image-preview" style="display:none;">
+
+            <label class="switch-row">
+                <span>القسم مفعّل ويظهر على الموقع</span>
+                <span class="switch">
+                    <input type="checkbox" id="workSectionIsActive" checked>
+                    <span class="switch-slider"></span>
+                </span>
+            </label>
+
+            <!-- معرض الصور — بيظهر بس لما يكون فيه قسم محفوظ (له id) -->
+            <div class="work-gallery-manager" id="workSectionGalleryWrap" style="display:none;">
+
+                <div class="gallery-manager-header">
+                    <div>
+                        <h3><i class="fa-solid fa-images"></i> معرض صور القسم</h3>
+                        <p>أضف صور الأعمال الخاصة بهذا القسم</p>
+                    </div>
+
+                    <label for="workSectionGalleryInput" class="gallery-add-btn">
+                        <i class="fa-solid fa-images"></i> إضافة صور
+                    </label>
+
+                    <input type="file" id="workSectionGalleryInput" accept="image/*" multiple hidden>
+                </div>
+
+                <div id="workSectionGallery" class="work-gallery-grid"></div>
+
+            </div>
+
+            <div class="work-modal-actions">
+                <button type="button" class="work-cancel-btn" id="closeWorkSectionModal">إلغاء</button>
+                <button type="submit" class="work-save-btn" id="saveWorkSection">
+                    <i class="fa-solid fa-check"></i> حفظ القسم
+                </button>
+            </div>
+
+            <div class="form-error" id="workSectionFormError"></div>
+
+        </form>
+
+    </div>
+</div>
+    </main>
+
+</div>
+
+
+<!-- ============== PRODUCT MODAL ============== -->
+<div class="modal" id="productModal">
+    <div class="modal-box">
+
+        <button class="modal-close" data-close="productModal">×</button>
+
+        <h3 id="productModalTitle">إضافة منتج</h3>
+
+        <form id="productForm">
+
+            <input type="hidden" id="productId">
+
+            <label>اسم المنتج</label>
+            <input type="text" id="productTitle" required>
+
+            <label>الوصف</label>
+            <textarea id="productDescription" rows="3"></textarea>
+
+            <div class="form-row">
+                <div>
+                    <label>السعر</label>
+                    <input type="number" step="0.01" id="productPrice" required>
+                </div>
+                <div>
+                    <label>السعر قبل الخصم (اختياري)</label>
+                    <input type="number" step="0.01" id="productOldPrice">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div>
+                    <label>نص الخصم (مثال: خصم 20%)</label>
+                    <input type="text" id="productDiscount">
+                </div>
+                <div>
+                    <label>التصنيف</label>
+                    <select id="productCategory">
+                        <option value="">بدون تصنيف</option>
+                    </select>
+                </div>
+            </div>
+
+            <label>صورة المنتج</label>
+            <input type="file" id="productImage" accept="image/*">
+            <img id="productImagePreview" class="image-preview" style="display:none;">
+
+            <button type="submit" class="btn-primary full">حفظ المنتج</button>
+
+            <div class="form-error" id="productFormError"></div>
+
+        </form>
+
+    </div>
+</div>
+
+
+<!-- ============== CATEGORY MODAL ============== -->
+<div class="modal" id="categoryModal">
+    <div class="modal-box">
+
+        <button class="modal-close" data-close="categoryModal">×</button>
+
+        <h3 id="categoryModalTitle">إضافة تصنيف</h3>
+
+        <form id="categoryForm">
+
+            <input type="hidden" id="categoryId">
+
+            <label>اسم التصنيف</label>
+            <input type="text" id="categoryName" required>
+
+            <label>صورة التصنيف (اختياري)</label>
+            <input type="file" id="categoryImage" accept="image/*">
+            <img id="categoryImagePreview" class="image-preview" style="display:none;">
+
+            <button type="submit" class="btn-primary full">حفظ التصنيف</button>
+
+            <div class="form-error" id="categoryFormError"></div>
+
+        </form>
+
+    </div>
+</div>
+
+
+<!-- ============== ARTICLE MODAL ============== -->
+<div class="modal" id="articleModal">
+    <div class="modal-box modal-box-wide">
+
+        <button class="modal-close" data-close="articleModal">×</button>
+
+        <h3 id="articleModalTitle">إضافة مقال</h3>
+
+        <form id="articleForm">
+
+            <input type="hidden" id="articleId">
+
+            <label>عنوان المقال</label>
+            <input type="text" id="articleTitle" required placeholder="مثال: كيف تختار مظلة سيارات مناسبة؟">
+
+            <label>رابط المقال (Slug) — بيتولّد تلقائي وممكن تعدّله</label>
+            <input type="text" id="articleSlug" placeholder="مثال: kefa-tokhtar-mazalla" dir="ltr">
+
+            <div class="form-row">
+                <div>
+                    <label>تصنيف المقال (اختياري)</label>
+                    <input type="text" id="articleCategory" placeholder="مثال: مظلات">
+                </div>
+                <div>
+                    <label>صورة المقال</label>
+                    <input type="file" id="articleImage" accept="image/*">
+                </div>
+            </div>
+
+            <img id="articleImagePreview" class="image-preview" style="display:none;">
+
+            <label>مقدمة قصيرة (تظهر في كارت المقال)</label>
+            <textarea id="articleExcerpt" rows="2" placeholder="ملخص قصير وجذاب عن محتوى المقال..."></textarea>
+
+            <label>محتوى المقال</label>
+
+            <div class="editor-toolbar" id="editorToolbar">
+                <button type="button" data-cmd="formatBlock" data-value="H2" title="عنوان رئيسي"><b>H2</b></button>
+                <button type="button" data-cmd="formatBlock" data-value="H3" title="عنوان فرعي"><b>H3</b></button>
+                <button type="button" data-cmd="bold" title="غامق"><i class="fa-solid fa-bold"></i></button>
+                <button type="button" data-cmd="italic" title="مائل"><i class="fa-solid fa-italic"></i></button>
+                <button type="button" data-cmd="insertUnorderedList" title="قائمة نقطية"><i class="fa-solid fa-list-ul"></i></button>
+                <button type="button" data-cmd="insertOrderedList" title="قائمة مرقمة"><i class="fa-solid fa-list-ol"></i></button>
+                <button type="button" data-cmd="createLink" title="إضافة رابط"><i class="fa-solid fa-link"></i></button>
+                <button type="button" data-cmd="removeFormat" title="إزالة التنسيق"><i class="fa-solid fa-eraser"></i></button>
+            </div>
+
+            <div id="articleContent" class="rich-editor" contenteditable="true" dir="rtl"></div>
+
+            <div class="seo-box">
+
+                <div class="seo-box-title">
+                    <i class="fa-solid fa-magnifying-glass-chart"></i>
+                    إعدادات ظهور المقال في محركات البحث (SEO)
+                </div>
+
+                <label>عنوان السيو (Meta Title) — لو فاضي هياخد عنوان المقال</label>
+                <input type="text" id="articleMetaTitle" maxlength="70">
+
+                <label>وصف السيو (Meta Description) — لو فاضي هياخد المقدمة القصيرة</label>
+                <textarea id="articleMetaDescription" rows="2" maxlength="160"></textarea>
+
+                <label>كلمات مفتاحية (افصل بينها بفاصلة)</label>
+                <input type="text" id="articleMetaKeywords" placeholder="مظلات, سواتر, حدادة">
+
+            </div>
+
+            <label class="switch-row">
+                <span>نشر المقال على الموقع فوراً</span>
+                <span class="switch">
+                    <input type="checkbox" id="articlePublished" checked>
+                    <span class="switch-slider"></span>
+                </span>
+            </label>
+
+            <button type="submit" class="btn-primary full">حفظ المقال</button>
+
+            <div class="form-error" id="articleFormError"></div>
+
+        </form>
+
+    </div>
+</div>
+<!-- ============== PROJECT MODAL ============== -->
+<div class="modal" id="projectModal">
+    <div class="modal-box">
+
+        <button class="modal-close" data-close="projectModal">×</button>
+
+        <h3 id="projectModalTitle">إضافة عمل</h3>
+
+        <form id="projectForm">
+
+            <input type="hidden" id="projectId">
+
+            <label>اسم المشروع</label>
+            <input type="text" id="projectTitle" required placeholder="مثال: مظلات سيارات">
+
+            <label>الوسم / التصنيف (يظهر فوق الصورة)</label>
+            <input type="text" id="projectTag" placeholder="مثال: أحدث المشاريع">
+
+            <label>الوصف</label>
+            <textarea id="projectDescription" rows="3" placeholder="وصف قصير عن المشروع"></textarea>
+
+            <label>ترتيب الظهور (اختياري — رقم أصغر يظهر الأول)</label>
+            <input type="number" id="projectOrder" value="0">
+
+            <label>صورة المشروع</label>
+            <input type="file" id="projectImage" accept="image/*">
+            <img id="projectImagePreview" class="image-preview" style="display:none;">
+
+            <button type="submit" class="btn-primary full">حفظ المشروع</button>
+
+            <div class="form-error" id="projectFormError"></div>
+
+        </form>
+
+    </div>
+</div>
+
+<!-- ============== SERVICE MODAL ============== -->
+<div class="modal" id="serviceModal">
+    <div class="modal-box">
+
+        <button class="modal-close" data-close="serviceModal">×</button>
+
+        <h3 id="serviceModalTitle">إضافة خدمة</h3>
+
+        <form id="serviceForm">
+
+            <input type="hidden" id="serviceId">
+
+            <label>اسم الخدمة</label>
+            <input type="text" id="serviceTitle" required placeholder="مثال: أنظمة التظليل الحديثة">
+
+            <label>الوصف</label>
+            <textarea id="serviceDescription" rows="3" placeholder="وصف قصير عن الخدمة"></textarea>
+
+            <label>الوسم (يظهر أسفل الوصف داخل الكارت)</label>
+            <input type="text" id="serviceTag" placeholder="مثال: الشماسي">
+
+            <label>ترتيب الظهور (اختياري — رقم أصغر يظهر الأول)</label>
+            <input type="number" id="serviceOrder" value="0">
+
+            <label>صورة الخدمة</label>
+            <input type="file" id="serviceImage" accept="image/*">
+            <img id="serviceImagePreview" class="image-preview" style="display:none;">
+
+            <button type="submit" class="btn-primary full">حفظ الخدمة</button>
+
+            <div class="form-error" id="serviceFormError"></div>
+
+        </form>
+
+    </div>
+</div>
+<div class="modal" id="heroSlideModal">
+    <div class="modal-box modal-box-wide">
+ 
+        <button class="modal-close" data-close="heroSlideModal">×</button>
+ 
+        <h3 id="heroSlideModalTitle">إضافة سلايد</h3>
+ 
+        <form id="heroSlideForm">
+ 
+            <input type="hidden" id="heroSlideId">
+ 
+            <div class="form-row">
+                <div>
+                    <label>الليبل الصغير (فوق العنوان)</label>
+                    <input type="text" id="heroSlideLabel" placeholder="اقرأ المزيد">
+                </div>
+                <div>
+                    <label>ترتيب الظهور (رقم أصغر يظهر الأول)</label>
+                    <input type="number" id="heroSlideOrder" value="0">
+                </div>
+            </div>
+ 
+            <label>العنوان الرئيسي (اضغط Enter لعمل سطر جديد)</label>
+            <textarea id="heroSlideTitle" rows="2" placeholder="نحو هياكل معدنية متينة&#10;تصنع المستقبل"></textarea>
+ 
+            <label>الوصف</label>
+            <textarea id="heroSlideDescription" rows="3" placeholder="وصف قصير عن السلايد"></textarea>
+ 
+            <div class="form-row">
+                <div>
+                    <label>نص زرار الـ CTA</label>
+                    <input type="text" id="heroSlideButtonText" placeholder="شاهد خدماتنا">
+                </div>
+                <div>
+                    <label>رابط زرار الـ CTA</label>
+                    <input type="text" id="heroSlideButtonLink" placeholder="services.html" dir="ltr">
+                </div>
+            </div>
+ 
+            <label>صورة خلفية السلايد</label>
+            <input type="file" id="heroSlideImage" accept="image/*">
+            <img id="heroSlideImagePreview" class="image-preview" style="display:none;">
+ 
+            <div class="seo-box">
+ 
+                <div class="seo-box-title">
+                    <i class="fa-solid fa-video"></i>
+                    كارت الفيديو المصاحب للسلايد
+                </div>
+ 
+                <label>الصورة المصغّرة لغلاف الفيديو</label>
+                <input type="file" id="heroSlideVideoThumb" accept="image/*">
+                <img id="heroSlideVideoThumbPreview" class="image-preview" style="display:none;">
+ 
+                <div class="form-row">
+                    <div>
+                        <label>رفع ملف فيديو (mp4)</label>
+                        <input type="file" id="heroSlideVideoFile" accept="video/mp4">
+                    </div>
+                    <div>
+                        <label>أو رابط فيديو خارجي (بدل الرفع)</label>
+                        <input type="text" id="heroSlideVideoUrl" placeholder="https://..." dir="ltr">
+                    </div>
+                </div>
+ 
+                <label>نص وصفي صغير أسفل الفيديو</label>
+                <textarea id="heroSlideVideoText" rows="2" placeholder="نقدم حلولًا متكاملة تساعد الشركات على بناء حضور قوي واحترافي."></textarea>
+ 
+            </div>
+ 
+            <button type="submit" class="btn-primary full">حفظ السلايد</button>
+ 
+            <div class="form-error" id="heroSlideFormError"></div>
+ 
+        </form>
+ 
+    </div>
+</div>
+ <div class="modal" id="orderModal">
+    <div class="modal-box modal-box-wide">
+ 
+        <button class="modal-close" data-close="orderModal">×</button>
+ 
+        <h3 id="orderModalTitle">تفاصيل الطلب</h3>
+ 
+        <div id="orderDetailsContent"></div>
+ 
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script src="admin.js"></script>
+</body>
+</html>

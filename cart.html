@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سلة المشتريات | رواد الظل</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dark-mode.css">
+
+    <style>
+        .cart-page {
+            font-family: 'Cairo', sans-serif;
+            direction: rtl;
+            padding: 140px 24px 100px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .cart-page h1 {
+            font-size: 30px;
+            font-weight: 800;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            background: #fff;
+            border-radius: 14px;
+            padding: 16px;
+            box-shadow: 0 3px 14px rgba(0,0,0,0.06);
+            margin-bottom: 16px;
+        }
+
+        .cart-item img {
+            width: 90px;
+            height: 90px;
+            border-radius: 10px;
+            object-fit: cover;
+            background: #f4f4f4;
+        }
+
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-title {
+            font-weight: 800;
+            font-size: 15px;
+            margin-bottom: 6px;
+        }
+
+        .cart-item-price {
+            color: #b8860b;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .cart-item-qty {
+            display: flex;
+            align-items: center;
+            border: 1px solid #e2e2e2;
+            border-radius: 50px;
+            overflow: hidden;
+        }
+
+        .cart-item-qty button {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: #f7f7f7;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .cart-item-qty input {
+            width: 40px;
+            text-align: center;
+            border: none;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 700;
+            outline: none;
+        }
+
+        .cart-item-remove {
+            color: #d64545;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .cart-empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: #9aa1a8;
+        }
+
+        .cart-empty a {
+            display: inline-block;
+            margin-top: 14px;
+            color: #b8860b;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .cart-summary {
+            background: #fff;
+            border-radius: 14px;
+            padding: 24px;
+            box-shadow: 0 3px 14px rgba(0,0,0,0.06);
+            margin-top: 24px;
+        }
+
+        .cart-summary-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 17px;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .cart-checkout-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 50px;
+            background: #25D366;
+            color: #fff;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="site-header">
+    <div class="header-container">
+        <a href="index.html" class="brand-logo">
+            <img src="images/logo.png" alt="رواد الظل">
+        </a>
+        <nav class="main-nav">
+            <a href="index.html" class="nav-link">الرئيسية</a>
+            <a href="store.html" class="nav-link">المتجر</a>
+            <a href="cart.html" class="nav-link active">سلة المشتريات</a>
+        </nav>
+        <a href="tel:+201000000000" class="header-contact">كلّمنا الآن</a>
+        <button class="mobile-menu-btn" aria-label="فتح القائمة">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+    </div>
+</header>
+
+<div class="mobile-nav" id="mobileNav">
+    <div class="mobile-nav-head">
+        <img src="images/logo.png" alt="رواد الظل">
+        <button id="mobileClose"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <nav>
+        <a href="index.html">الرئيسية</a>
+        <a href="store.html">المتجر</a>
+        <a href="cart.html">سلة المشتريات</a>
+    </nav>
+</div>
+
+<main class="cart-page" dir="rtl">
+    <h1>سلة المشتريات</h1>
+    <div id="cartItemsContainer"></div>
+    <div id="cartSummaryContainer"></div>
+</main>
+
+<footer class="rz-footer" dir="rtl">
+    <div class="rz-footer-container">
+        <div class="rz-footer-right">
+            <a href="/" class="rz-footer-logo">
+                <div class="rz-logo-text">
+                    <strong>رواد الظل</strong>
+                    <small>ROAD ALZILL</small>
+                </div>
+            </a>
+        </div>
+        <div class="rz-footer-center">
+            <div class="rz-copyright">
+                جميع الحقوق محفوظة لشركة <strong>رواد الظل</strong> © 2026
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="script.js"></script>
+<script src="cart.js"></script>
+<script src="dark-mode.js"></script>
+<script src="cart-page.js"></script>
+<script src="settings-loader.js"></script>
+</body>
+</html>

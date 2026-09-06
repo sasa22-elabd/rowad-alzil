@@ -1,0 +1,3006 @@
+:root{
+    --dm-bg:            #121212;
+    --dm-bg-alt:        #121212;
+    --dm-surface:       #1c1c1c;
+    --dm-surface-2:     #242424;
+    --dm-border:        #2e2e2e;
+    --dm-text:          #eef0f3;
+    --dm-text-dim:      #a8afba;
+    --dm-text-mute:     #7c8492;
+    --dm-gold:          #f5a914;
+    --dm-gold-dark:     #d98b00;
+}
+
+/* انتقال ناعم بين الوضعين لكل عنصر تقريباً */
+html.theme-ready,
+html.theme-ready *{
+    transition:
+        background-color .35s ease,
+        color .35s ease,
+        border-color .35s ease,
+        box-shadow .35s ease !important;
+}
+
+/* ---------------------------------------------------------------
+   2) الهيدر الثابت / المتحرك مع السكرول
+--------------------------------------------------------------- */
+.site-header{
+    position: sticky;
+    top: 0;
+    transition:
+        transform .35s ease,
+        box-shadow .3s ease,
+        background-color .3s ease,
+        height .3s ease;
+}
+
+.site-header.rw-scrolled{
+    box-shadow: 0 8px 30px rgba(0,0,0,.12);
+}
+
+.site-header.rw-hidden{
+    transform: translateY(-100%);
+}
+
+html[data-theme="dark"] .site-header.rw-scrolled{
+    box-shadow: 0 8px 30px rgba(0,0,0,.55);
+}
+
+/* ---------------------------------------------------------------
+   3) زر تبديل الوضع الداكن
+--------------------------------------------------------------- */
+.theme-toggle{
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #f4f4f4;
+    color: #333;
+
+    font-size: 16px;
+
+    border: 1px solid transparent;
+
+    transition:
+        background .3s ease,
+        color .3s ease,
+        transform .3s ease,
+        border-color .3s ease;
+}
+
+.theme-toggle:hover{
+    background: var(--gold, #f5a914);
+    color: #fff;
+    transform: translateY(-2px) rotate(15deg);
+}
+
+.theme-toggle .fa-sun{ display:none; }
+.theme-toggle .fa-moon{ display:inline-block; }
+
+html[data-theme="dark"] .theme-toggle{
+    background: var(--dm-surface-2);
+    color: var(--dm-gold);
+    border-color: var(--dm-border);
+}
+
+html[data-theme="dark"] .theme-toggle .fa-sun{ display:inline-block; }
+html[data-theme="dark"] .theme-toggle .fa-moon{ display:none; }
+
+/* زر الموبايل نفس السلوك بحجم مطابق لأزرار قائمة الموبايل */
+.mobile-nav-head .theme-toggle{
+    width: 42px;
+    height: 42px;
+    margin-left: 8px;
+}
+
+/* ---------------------------------------------------------------
+   4) عام: خلفية ونص الصفحة
+--------------------------------------------------------------- */
+html[data-theme="dark"] body{
+    background: var(--dm-bg);
+    color: var(--dm-text);
+}
+
+/* ---------------------------------------------------------------
+   5) الهيدر + التنقل
+--------------------------------------------------------------- */
+html[data-theme="dark"] .site-header{
+    background: rgba(13,15,19,0.92);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 5px 25px rgba(0,0,0,.35);
+}
+
+html[data-theme="dark"] .nav-link{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .nav-link:hover,
+html[data-theme="dark"] .nav-link.active{
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .mobile-menu-btn{
+    background: var(--dm-gold);
+}
+
+/* ---------------------------------------------------------------
+   6) الهيرو
+--------------------------------------------------------------- */
+html[data-theme="dark"] .hero-video-card{
+    background: var(--dm-surface);
+    box-shadow: 0 20px 50px rgba(0,0,0,.45);
+}
+
+html[data-theme="dark"] .video-info p{
+    color: var(--dm-text-dim);
+}
+
+html[data-theme="dark"] .slide-counter span:first-child{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .slide-counter span:last-child{
+    color: var(--dm-text-mute);
+}
+
+html[data-theme="dark"] .hero-social{
+    background: var(--dm-surface);
+}
+
+html[data-theme="dark"] .hero-social a{
+    background: var(--dm-surface-2);
+}
+
+/* ---------------------------------------------------------------
+   7) القائمة الجانبية للموبايل
+--------------------------------------------------------------- */
+html[data-theme="dark"] .mobile-nav{
+    background: var(--dm-bg-alt);
+    box-shadow: -15px 0 40px rgba(0,0,0,.5);
+}
+
+html[data-theme="dark"] .mobile-nav-head{
+    border-color: var(--dm-border);
+}
+
+html[data-theme="dark"] .mobile-nav-head button{
+    background: var(--dm-surface-2);
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .mobile-nav nav a{
+    color: var(--dm-text);
+    border-color: var(--dm-border);
+}
+
+html[data-theme="dark"] .mobile-nav nav a:hover{
+    color: var(--dm-gold);
+}
+
+/* ---------------------------------------------------------------
+   8) قسم الإحصائيات + من نحن
+--------------------------------------------------------------- */
+html[data-theme="dark"] .rw-stats-section,
+html[data-theme="dark"] .rw-about-section,
+html[data-theme="dark"] .rw-about-area{
+    background: var(--dm-bg);
+}
+
+html[data-theme="dark"] .rw-stat-number{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .rw-stat-title{
+    color: var(--dm-text-dim);
+}
+
+html[data-theme="dark"] .rw-stat-divider{
+    background: var(--dm-border);
+}
+
+html[data-theme="dark"] .rw-small-label{
+    background: #3a2f18;
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .rw-about-title,
+html[data-theme="dark"] .rw-about-left-title{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .rw-about-right p,
+html[data-theme="dark"] .rw-about-left p{
+    color: var(--dm-text-dim);
+}
+
+html[data-theme="dark"] .rw-manager-info strong,
+html[data-theme="dark"] .rw-manager-info span{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .rw-about-image{
+    background: var(--dm-surface);
+}
+
+/* ---------------------------------------------------------------
+   9) الخدمات المتخصصة
+--------------------------------------------------------------- */
+html[data-theme="dark"] .rw-special-services{
+    background: var(--dm-bg);
+}
+
+html[data-theme="dark"] .rw-services-header h2{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .rw-services-header p{
+    color: var(--dm-text-dim);
+}
+
+html[data-theme="dark"] .rw-service-info{
+    background: rgba(26,30,38,0.96);
+}
+
+html[data-theme="dark"] .rw-service-info h3{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .rw-service-info p{
+    color: var(--dm-text-dim);
+}
+
+/* ---------------------------------------------------------------
+   10) المنتجات
+--------------------------------------------------------------- */
+html[data-theme="dark"] .rw-products{
+    background: var(--dm-bg);
+}
+
+html[data-theme="dark"] .rw-products-header h2{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .rw-products-header p{
+    color: var(--dm-text-mute);
+}
+
+html[data-theme="dark"] .rw-product-image{
+    background: var(--dm-surface);
+}
+
+html[data-theme="dark"] .rw-product-title{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .rw-product-category{
+    color: var(--dm-text-mute);
+}
+
+html[data-theme="dark"] .rw-old-price{
+    color: var(--dm-text-mute);
+}
+
+html[data-theme="dark"] .rw-page-btn{
+    color: var(--dm-text-dim);
+}
+
+html[data-theme="dark"] .rw-page-btn:hover{
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .rw-page-arrow:hover{
+    background: var(--dm-surface-2);
+}
+
+html[data-theme="dark"] .rw-products-empty{
+    color: var(--dm-text-mute);
+}
+
+/* ---------------------------------------------------------------
+   11) خطوات العمل
+--------------------------------------------------------------- */
+html[data-theme="dark"] .process-section{
+    --text: #eef0f3;
+    background: var(--dm-bg);
+}
+
+html[data-theme="dark"] .step-icon{
+    border-color: var(--dm-bg);
+    box-shadow:
+        0 0 0 2px #6b4d18,
+        0 5px 16px rgba(0,0,0,.35);
+}
+
+html[data-theme="dark"] .process-timeline::before{
+    background: linear-gradient(to bottom, #6b4d18, #d98b00, #6b4d18);
+}
+
+/* ---------------------------------------------------------------
+   12) أحدث المشاريع
+--------------------------------------------------------------- */
+html[data-theme="dark"] .projects-section{
+    background: var(--dm-bg);
+}
+
+html[data-theme="dark"] .projects-header h2{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .projects-header p{
+    color: var(--dm-text-mute);
+}
+
+html[data-theme="dark"] .project-card{
+    background: var(--dm-surface);
+    box-shadow: 0 8px 25px rgba(0,0,0,.4);
+}
+
+html[data-theme="dark"] .project-info{
+    background: rgba(26,30,38,.97);
+    box-shadow: 0 12px 35px rgba(0,0,0,.5);
+}
+
+html[data-theme="dark"] .project-info h3{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .project-info p{
+    color: var(--dm-text-dim);
+}
+
+html[data-theme="dark"] .slider-btn{
+    background: var(--dm-surface-2);
+    color: var(--dm-gold);
+    box-shadow: 0 5px 25px rgba(0,0,0,.4);
+}
+
+html[data-theme="dark"] .projects-note p{
+    color: var(--dm-text-mute);
+}
+
+/* ---------------------------------------------------------------
+   13) المقالات
+--------------------------------------------------------------- */
+html[data-theme="dark"] .shadow-articles-section{
+    background: var(--dm-bg);
+}
+
+html[data-theme="dark"] .shadow-articles-header p{
+    color: var(--dm-text-dim);
+}
+
+html[data-theme="dark"] .shadow-article-media{
+    background: var(--dm-surface);
+}
+
+html[data-theme="dark"] .shadow-article-arrow{
+    background: rgba(32,36,46,.96);
+}
+
+html[data-theme="dark"] .shadow-article-arrow span{
+    border-color: var(--dm-text);
+}
+
+html[data-theme="dark"] .shadow-article-arrow:hover span{
+    border-color: #fff;
+}
+
+html[data-theme="dark"] .shadow-articles-more a{
+    background: var(--dm-surface);
+    border-color: var(--dm-gold);
+    color: var(--dm-gold);
+}
+
+/* ---------------------------------------------------------------
+   14) نطاق التغطية
+--------------------------------------------------------------- */
+html[data-theme="dark"] .coverage-section{
+    background: var(--dm-bg);
+}
+
+html[data-theme="dark"] .coverage-heading h2{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .coverage-heading p{
+    color: var(--dm-text-dim);
+}
+
+html[data-theme="dark"] .coverage-item p{
+    color: var(--dm-text-dim);
+}
+
+html[data-theme="dark"] .coverage-map::after{
+    background: rgba(0,0,0,.35);
+}
+
+/* ---------------------------------------------------------------
+   15) الفوتر
+--------------------------------------------------------------- */
+html[data-theme="dark"] .rz-footer{
+    background: var(--dm-bg-alt);
+    color: var(--dm-text-dim);
+    border-top-color: rgba(245,169,20,.12);
+}
+
+html[data-theme="dark"] .rz-contact-item{
+    color: var(--dm-text-dim);
+}
+
+html[data-theme="dark"] .rz-contact-item:hover{
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .rz-footer-button{
+    background: var(--dm-surface);
+    color: var(--dm-gold);
+    border-color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .rz-footer-button:hover{
+    background: var(--dm-gold);
+    color: #111;
+}
+
+html[data-theme="dark"] .rz-footer-nav a{
+    color: var(--dm-text-dim);
+}
+
+html[data-theme="dark"] .rz-footer-nav a:hover{
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .rz-social a{
+    color: var(--dm-gold);
+    border-color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .rz-social a:hover{
+    background: var(--dm-gold);
+    color: #111;
+}
+
+html[data-theme="dark"] .rz-copyright{
+    color: var(--dm-text-mute);
+}
+
+/* ---------------------------------------------------------------
+   16) الفيديو مودال — أصلاً غامق، تعديل بسيط فقط
+--------------------------------------------------------------- */
+html[data-theme="dark"] .video-close{
+    background: var(--dm-surface-2);
+    color: var(--dm-text);
+}
+
+/* ---------------------------------------------------------------
+   17) صفحة "من نحن" — الهيرو + قسم من نحن
+--------------------------------------------------------------- */
+html[data-theme="dark"] .rd-hero-about{
+    background: var(--dm-bg);
+}
+
+html[data-theme="dark"] .rd-decoration svg{
+    stroke: var(--dm-gold);
+    opacity: .8;
+}
+
+html[data-theme="dark"] .rd-about-content p{
+    color: var(--dm-text-dim);
+}
+html[data-theme="dark"] .step-content h3{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .process-title{
+    color: var(--dm-text);
+}
+html[data-theme="dark"] .site-header{
+    background: transparent;
+    box-shadow: none;
+}
+
+html[data-theme="dark"] .site-header.rw-scrolled{
+    background: rgba(13,15,19,0.92);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 5px 25px rgba(0,0,0,.35);
+}
+
+html[data-theme="dark"] .nav-link{
+    color: #fff;
+}
+
+html[data-theme="dark"] .site-header.rw-scrolled .nav-link{
+    color: var(--dm-text);
+}
+/* ---------------------------------------------------------------
+   18) صفحة "من نحن" — قسم خبراء المجال
+--------------------------------------------------------------- */
+html[data-theme="dark"] .exp-team-section{
+    background: var(--dm-bg);
+}
+
+html[data-theme="dark"] .exp-team-image{
+    background: var(--dm-bg);
+}
+
+/* الفيد الأبيض لازم يتحول لفيد بلون خلفية الوضع الداكن نفسه
+   عشان الصورة تندمج بدل ما يفضل مربع أبيض واضح حواليها */
+html[data-theme="dark"] .exp-team-fade{
+    background: linear-gradient(
+        to top,
+        var(--dm-bg) 0%,
+        rgba(13,15,19,.94) 22%,
+        rgba(13,15,19,.65) 50%,
+        rgba(13,15,19,0) 100%
+    );
+}
+
+html[data-theme="dark"] .exp-team-content p{
+    color: var(--dm-text-dim);
+}
+
+html[data-theme="dark"] .exp-team-button{
+    background: var(--dm-surface);
+    border-color: var(--dm-gold);
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .exp-team-card:hover .exp-team-button{
+    background: var(--dm-gold);
+    color: #111;
+}
+
+/* ---------------------------------------------------------------
+   19) صفحة "من نحن" — قسم رسالتنا
+--------------------------------------------------------------- */
+html[data-theme="dark"] .rw-message-section{
+    background: var(--dm-bg);
+}
+
+html[data-theme="dark"] .rw-message-content p{
+    color: var(--dm-text-dim);
+}
+
+/* ---------------------------------------------------------------
+   20) صفحة "من نحن" — قسم القيم (خلفية ذهبية أصلاً، نغمّقها شوية بس)
+--------------------------------------------------------------- */
+html[data-theme="dark"] .rw-values-section{
+    background: #a97a2f;
+}
+
+/* ---------------------------------------------------------------
+   22) صفحة "تصنيفاتنا" — الناف بار + الأقسام + المنتجات
+--------------------------------------------------------------- */
+html[data-theme="dark"] .navbar{
+    background: rgba(13,15,19,.96);
+    box-shadow: 0 4px 22px rgba(0,0,0,.4);
+}
+
+html[data-theme="dark"] .menu a{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .menu a:hover,
+html[data-theme="dark"] .menu a.active{
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .categories-title::before,
+html[data-theme="dark"] .categories-title::after{
+    background: var(--dm-border);
+}
+
+html[data-theme="dark"] .categories-title h2{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .category-badge{
+    background: radial-gradient(
+        circle at 50% 35%,
+        var(--dm-surface-2) 0%,
+        var(--dm-surface) 50%,
+        #2c2313 100%
+    );
+    border-color: var(--dm-gold-dark);
+    box-shadow:
+        0 12px 30px rgba(0,0,0,.35),
+        inset 0 0 0 5px rgba(255,255,255,.03);
+}
+
+html[data-theme="dark"] .category-badge::before{
+    border-color: rgba(217,139,0,.5);
+}
+
+html[data-theme="dark"] .category-badge::after{
+    border-color: rgba(217,139,0,.3);
+}
+
+html[data-theme="dark"] .category-icon{
+    background: linear-gradient(
+        145deg,
+        rgba(255,255,255,.04),
+        rgba(217,139,0,.06)
+    );
+    border-color: var(--dm-gold-dark);
+}
+
+html[data-theme="dark"] .category-name{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .category:hover .category-name,
+html[data-theme="dark"] .category.active .category-name{
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .products-heading{
+    border-color: var(--dm-border);
+}
+
+html[data-theme="dark"] .products-heading h2{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .products-heading span{
+    color: var(--dm-text-mute);
+}
+
+html[data-theme="dark"] .product-card{
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    box-shadow: 0 10px 30px rgba(0,0,0,.35);
+}
+
+html[data-theme="dark"] .product-card:hover{
+    border-color: var(--dm-gold-dark);
+    box-shadow: 0 25px 50px rgba(0,0,0,.5);
+}
+
+html[data-theme="dark"] .product-img{
+    background: radial-gradient(
+        circle at 50% 35%,
+        var(--dm-surface-2) 0%,
+        var(--dm-surface) 60%,
+        var(--dm-bg-alt) 100%
+    );
+}
+
+html[data-theme="dark"] .product-category-tag{
+    background: rgba(217,139,0,.12);
+    border-color: var(--dm-gold-dark);
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .product-info h3{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .product-card:hover .product-info h3{
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .product-info p{
+    color: var(--dm-text-dim);
+}
+
+html[data-theme="dark"] .product-info{
+    background: var(--dm-surface);
+}
+
+html[data-theme="dark"] .product-footer{
+    border-color: var(--dm-border);
+}
+
+html[data-theme="dark"] .price{
+    background: linear-gradient(135deg, rgba(217,139,0,.18), rgba(217,139,0,.10));
+    border-color: var(--dm-gold-dark);
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .price-old{
+    color: var(--dm-text-mute);
+}
+
+html[data-theme="dark"] .all-products a{
+    background: var(--dm-surface);
+    border-color: var(--dm-gold-dark);
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .all-products a:hover{
+    background: var(--dm-gold);
+    color: #111;
+    border-color: var(--dm-gold);
+}
+
+/* ---------------------------------------------------------------
+   23) صفحة "خدماتنا" — الهيرو + المقدمة + الكروت + لماذا نحن
+--------------------------------------------------------------- */
+
+/* HERO */
+html[data-theme="dark"] .services-hero{
+    background: #000;
+}
+
+html[data-theme="dark"] .breadcrumb span{
+    color: var(--dm-text-mute);
+}
+
+/* INTRO */
+html[data-theme="dark"] .services-intro{
+    background: var(--dm-bg);
+}
+
+html[data-theme="dark"] .section-heading h2{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .section-description{
+    color: var(--dm-text-dim);
+}
+
+/* SERVICE CARDS */
+html[data-theme="dark"] .services-cards{
+    background: var(--dm-bg);
+}
+
+html[data-theme="dark"] .service-card{
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    box-shadow: 0 8px 30px rgba(0,0,0,.35);
+}
+
+html[data-theme="dark"] .service-card:hover{
+    box-shadow: 0 18px 40px rgba(0,0,0,.5);
+}
+
+html[data-theme="dark"] .service-icon{
+    background: var(--dm-surface-2);
+    border-color: var(--dm-border);
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .service-card:hover .service-icon{
+    background: var(--dm-gold);
+    color: #111;
+    border-color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .service-number{
+    color: #3a3020;
+}
+
+html[data-theme="dark"] .service-card h3{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .service-card p{
+    color: var(--dm-text-dim);
+}
+
+html[data-theme="dark"] .service-link{
+    background: var(--dm-surface);
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .service-link:hover{
+    color: #fff;
+}
+
+/* WHY US */
+html[data-theme="dark"] .why-us{
+    background: var(--dm-bg-alt);
+}
+
+html[data-theme="dark"] .why-us::before{
+    border-color: rgba(245,169,20,.12);
+}
+
+html[data-theme="dark"] .why-content h2{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .why-content h2 strong{
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .why-content > p{
+    color: var(--dm-text-dim);
+}
+
+html[data-theme="dark"] .why-feature{
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+}
+
+html[data-theme="dark"] .why-feature:hover{
+    border-color: var(--dm-gold-dark);
+    box-shadow: 0 12px 30px rgba(0,0,0,.4);
+}
+
+html[data-theme="dark"] .feature-icon{
+    background: rgba(245,169,20,.10);
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .why-feature h3{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .why-feature p{
+    color: var(--dm-text-dim);
+}
+
+/* ---------------------------------------------------------------
+   24) بادج سلة المشتريات في الهيدر
+--------------------------------------------------------------- */
+html[data-theme="dark"] .cart-count{
+    background: var(--dm-gold);
+    color: #111;
+    box-shadow: 0 4px 10px rgba(0,0,0,.4);
+}
+
+html[data-theme="dark"] .cart-badge{
+    color: var(--dm-text);
+}
+
+/* ---------------------------------------------------------------
+   21) موبايل — تصغير زر الوضع الداكن قليلاً
+--------------------------------------------------------------- */
+@media (max-width: 600px){
+    .theme-toggle{
+        width: 40px;
+        height: 40px;
+        font-size: 14px;
+    }
+}
+/* ---------------------------------------------------------------
+   25) صفحة "المتجر" — العنوان + البحث + الفلتر + كارت المنتج
+--------------------------------------------------------------- */
+
+html[data-theme="dark"] .store-heading h1{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .store-heading p{
+    color: var(--dm-text-mute);
+}
+
+html[data-theme="dark"] .store-search-box i{
+    color: var(--dm-text-mute);
+}
+
+html[data-theme="dark"] #storeSearch{
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] #storeSearch::placeholder{
+    color: var(--dm-text-mute);
+}
+
+html[data-theme="dark"] #storeSearch:focus{
+    border-color: var(--dm-gold);
+}
+
+html[data-theme="dark"] #storeCategoryFilter{
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .rw-product-card{
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+}
+
+html[data-theme="dark"] .rw-product-card:hover{
+    box-shadow: 0 14px 30px rgba(0,0,0,.45);
+}
+
+html[data-theme="dark"] .rw-product-badge{
+    background: #b23c3c;
+}
+
+html[data-theme="dark"] .rw-product-overlay{
+    background: rgba(0,0,0,0.5);
+}
+
+html[data-theme="dark"] .rw-overlay-btn{
+    background: var(--dm-surface-2);
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .rw-overlay-btn:hover{
+    background: var(--dm-gold);
+    color: #111;
+}
+
+html[data-theme="dark"] .rw-product-category{
+    background: #3a2f18;
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .rw-sale-price{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .rw-add-cart{
+    background: var(--dm-surface-2);
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .rw-add-cart:hover,
+html[data-theme="dark"] .rw-add-cart.added{
+    background: var(--dm-gold);
+    color: #111;
+}
+
+html[data-theme="dark"] .rw-page-btn{
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: var(--dm-text-dim);
+}
+
+html[data-theme="dark"] .rw-page-btn.active{
+    background: var(--dm-gold);
+    color: #111;
+    border-color: var(--dm-gold);
+}
+/* ---------------------------------------------------------------
+   26) صفحة "سلة المشتريات" — العناصر + الملخص + زر الإتمام
+--------------------------------------------------------------- */
+
+html[data-theme="dark"] .cart-page h1{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .cart-item{
+    background: var(--dm-surface);
+    box-shadow: 0 3px 14px rgba(0,0,0,.35);
+}
+
+html[data-theme="dark"] .cart-item img{
+    background: var(--dm-surface-2);
+}
+
+html[data-theme="dark"] .cart-item-title{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .cart-item-price{
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .cart-item-qty{
+    border-color: var(--dm-border);
+}
+
+html[data-theme="dark"] .cart-item-qty button{
+    background: var(--dm-surface-2);
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .cart-item-qty input{
+    background: transparent;
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .cart-item-remove{
+    color: #e05c5c;
+}
+
+html[data-theme="dark"] .cart-empty{
+    color: var(--dm-text-mute);
+}
+
+html[data-theme="dark"] .cart-empty a{
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .cart-summary{
+    background: var(--dm-surface);
+    box-shadow: 0 3px 14px rgba(0,0,0,.35);
+}
+
+html[data-theme="dark"] .cart-summary-row{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .cart-checkout-btn{
+    box-shadow: 0 8px 20px rgba(0,0,0,.4);
+}
+/* =========================================================
+   HERO — دارك مود لنسخة الموبايل/التابلت
+   يُضاف كملف مستقل بعد الكود اللي فوق، مايعدلش على حاجة
+========================================================= */
+
+@media (max-width: 950px) {
+
+    html[data-theme="dark"] .hero-section{
+        box-shadow: 0 20px 50px rgba(0,0,0,.5);
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    html[data-theme="dark"] .hero-video-card{
+        background: var(--dm-surface);
+        box-shadow: 0 12px 30px rgba(0,0,0,.45);
+    }
+
+    html[data-theme="dark"] .video-preview{
+        background: var(--dm-surface-2);
+    }
+
+    html[data-theme="dark"] .play-button{
+        background: var(--dm-gold);
+        color: #111;
+    }
+
+    html[data-theme="dark"] .video-info p{
+        color: var(--dm-text-dim);
+    }
+
+    html[data-theme="dark"] .slide-counter span:first-child{
+        color: var(--dm-text);
+    }
+
+    html[data-theme="dark"] .slide-counter span:last-child{
+        color: var(--dm-text-mute);
+    }
+
+    html[data-theme="dark"] .hero-social{
+        background: var(--dm-surface);
+        box-shadow: 0 8px 20px rgba(0,0,0,.4);
+    }
+
+    html[data-theme="dark"] .hero-social a{
+        background: var(--dm-surface-2);
+        color: var(--dm-text);
+    }
+
+    html[data-theme="dark"] .slider-controls button{
+        background: var(--dm-surface-2);
+        color: var(--dm-gold);
+        box-shadow: 0 4px 14px rgba(0,0,0,.4);
+    }
+
+    html[data-theme="dark"] .hero-dot{
+        background: rgba(255,255,255,.25);
+    }
+
+    html[data-theme="dark"] .hero-dot.active{
+        background: var(--dm-gold);
+    }
+
+    html[data-theme="dark"] .hero-label{
+        background: var(--dm-surface-2);
+        color: var(--dm-gold);
+        border-color: var(--dm-border);
+    }
+
+}
+
+@media (max-width: 400px) {
+
+    html[data-theme="dark"] .hero-video-card{
+        box-shadow: 0 10px 24px rgba(0,0,0,.45);
+    }
+
+}
+
+/* =========================================================
+   PROCESS SECTION — دارك مود لكارت النص في الموبايل (900px وتحت)
+========================================================= */
+
+@media (max-width: 900px){
+
+    html[data-theme="dark"] .process-section{
+        background: var(--dm-bg);
+    }
+
+    html[data-theme="dark"] .step-content{
+        background: var(--dm-surface);
+        border-color: var(--dm-border);
+        box-shadow: 0 6px 20px rgba(0,0,0,.35);
+    }
+
+    html[data-theme="dark"] .step-content h3{
+        color: var(--dm-text);
+    }
+
+    html[data-theme="dark"] .process-step:hover .step-content h3{
+        color: var(--dm-gold);
+    }
+
+    /* رقم الخطوة الصغير أعلى الأيقونة */
+    html[data-theme="dark"] .process-step::before{
+        background: var(--dm-surface);
+        color: var(--dm-gold);
+        border-color: var(--dm-gold);
+    }
+
+    /* حلقة الخلفية حوالين الأيقونة لازم تتغير للون خلفية القسم الغامق */
+    html[data-theme="dark"] .step-icon{
+        box-shadow: 0 0 0 5px var(--dm-bg), 0 0 0 6px #6b4d18, 0 6px 16px rgba(0,0,0,.4);
+    }
+
+}
+html[data-theme="dark"] .mobile-cart-btn{
+    background: var(--dm-surface-2);
+    color: var(--dm-gold);
+    border: 1px solid var(--dm-border);
+}
+
+html[data-theme="dark"] .mobile-cart-count{
+    border-color: var(--dm-bg);
+}
+
+html[data-theme="dark"] .mobile-menu-btn{
+    background: var(--dm-gold);
+    color: #111;
+}
+@media (max-width: 1300px){
+
+    html[data-theme="dark"] .cart-badge{
+        background: var(--dm-surface-2);
+        color: var(--dm-gold);
+        border: 1px solid var(--dm-border);
+    }
+
+    html[data-theme="dark"] .cart-badge .cart-count{
+        border-color: var(--dm-bg);
+    }
+
+}
+html[data-theme="dark"] .cart-badge{
+    background: var(--dm-surface-2);
+    color: var(--dm-gold);
+    border: 1px solid var(--dm-border);
+}
+
+html[data-theme="dark"] .cart-badge .cart-count{
+    border-color: var(--dm-bg);
+}
+html[data-theme="dark"] .mobile-menu-btn{
+    background: var(--dm-gold);
+    color: #111;
+}
+html[data-theme="dark"] .navbar{
+    background: rgba(13,15,19,.96);
+    box-shadow: 0 4px 22px rgba(0,0,0,.4);
+}
+
+html[data-theme="dark"] .menu a{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .menu a:hover,
+html[data-theme="dark"] .menu a.active{
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .menu-cart-badge{
+    background: var(--dm-surface-2);
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .mobile-nav{
+    background: var(--dm-bg-alt);
+}
+
+html[data-theme="dark"] .mobile-nav-head button{
+    background: var(--dm-surface-2);
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .mobile-nav nav a{
+    color: var(--dm-text);
+    border-color: var(--dm-border);
+}
+
+/* =========================================================
+   27) صفحات تفاصيل الخدمة (سواتر / شماسي / أثاث / كريتال / منشآت)
+   نفس بنية الكروت (.shade-card / .shades-cta / .features-grid)
+   متكررة في كل صفحات الخدمة، فالقواعد دي شغالة عليهم كلهم
+========================================================= */
+
+/* الخلفية العامة للصفحة */
+html[data-theme="dark"] .shades-page{
+    background: var(--dm-bg);
+    color: var(--dm-text-dim);
+}
+
+/* عناوين الأقسام */
+html[data-theme="dark"] .shades-page .section-heading h2{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .shades-page .section-description{
+    color: var(--dm-text-dim);
+}
+
+/* كارت جانبي فوق صورة الهيرو */
+html[data-theme="dark"] .shades-floating-card{
+    background: rgba(28,28,28,.97);
+    box-shadow: 0 12px 30px rgba(0,0,0,.5);
+}
+
+html[data-theme="dark"] .shades-floating-card strong{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .shades-floating-card small{
+    color: var(--dm-text-mute);
+}
+
+/* كروت السواتر/المنتجات في شبكة .shades-grid */
+html[data-theme="dark"] .shade-card{
+    background: var(--dm-surface);
+    box-shadow: 0 8px 25px rgba(0,0,0,.35);
+}
+
+html[data-theme="dark"] .shade-card:hover{
+    box-shadow: 0 15px 35px rgba(0,0,0,.5);
+}
+
+html[data-theme="dark"] .shade-card-title{
+    background: rgba(28,28,28,.96);
+    color: var(--dm-text);
+}
+
+/* شريط المميزات */
+html[data-theme="dark"] .features-grid{
+    border-top-color: var(--dm-border);
+}
+
+html[data-theme="dark"] .feature{
+    border-left-color: var(--dm-border);
+}
+
+html[data-theme="dark"] .feature h3{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .feature p{
+    color: var(--dm-text-mute);
+}
+
+/* بطاقة الدعوة لإجراء (تواصل معنا) */
+html[data-theme="dark"] .shades-cta{
+    background: var(--dm-surface);
+}
+
+html[data-theme="dark"] .cta-content h2{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .cta-content p{
+    color: var(--dm-text-dim);
+}
+
+/* حدود شبكة المميزات في التابلت والموبايل بعد ما بتتغير */
+@media (max-width: 900px){
+    html[data-theme="dark"] .feature:nth-child(3){
+        border-left-color: var(--dm-border);
+    }
+}
+
+@media (max-width: 600px){
+    html[data-theme="dark"] .feature{
+        border-left-color: var(--dm-border);
+        border-bottom-color: var(--dm-border);
+    }
+}
+/* ---------------------------------------------------------------
+   28) صفحة تفاصيل الخدمة — المنشآت المعدنية (.manshaat-*)
+--------------------------------------------------------------- */
+
+/* الكارت العائم فوق الهيرو */
+html[data-theme="dark"] .manshaat-floating-card{
+    background: rgba(28,28,28,.97);
+    box-shadow: 0 12px 30px rgba(0,0,0,.5);
+}
+
+html[data-theme="dark"] .manshaat-floating-card small{
+    color: var(--dm-text-mute);
+}
+
+/* المقدمة */
+html[data-theme="dark"] .manshaat-intro p{
+    color: var(--dm-text-dim);
+}
+
+/* كروت الخدمات */
+html[data-theme="dark"] .manshaat-card{
+    background: var(--dm-surface);
+    box-shadow: 0 7px 25px rgba(0,0,0,.35);
+}
+
+html[data-theme="dark"] .manshaat-card:hover{
+    box-shadow: 0 15px 35px rgba(0,0,0,.5);
+}
+
+html[data-theme="dark"] .manshaat-info h3{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .manshaat-info p{
+    color: var(--dm-text-dim);
+}
+
+/* القسم المميز (من الفكرة إلى التنفيذ) */
+html[data-theme="dark"] .manshaat-featured{
+    background: var(--dm-surface);
+}
+
+html[data-theme="dark"] .manshaat-featured-content > p{
+    color: var(--dm-text-dim);
+}
+
+html[data-theme="dark"] .manshaat-points div{
+    color: var(--dm-text-dim);
+}
+
+/* لماذا نحن */
+html[data-theme="dark"] .manshaat-features-grid{
+    border-top-color: var(--dm-border);
+}
+
+html[data-theme="dark"] .manshaat-feature{
+    border-left-color: var(--dm-border);
+}
+
+html[data-theme="dark"] .manshaat-feature p{
+    color: var(--dm-text-mute);
+}
+
+/* مراحل التنفيذ */
+html[data-theme="dark"] .manshaat-process-item > div{
+    background: var(--dm-surface);
+    box-shadow: 0 0 0 2px var(--dm-bg);
+}
+
+html[data-theme="dark"] .manshaat-process-item p{
+    color: var(--dm-text-mute);
+}
+/* ---------------------------------------------------------------
+   29) صفحة تفاصيل الخدمة — الأثاث المعدني (.metal-*)
+--------------------------------------------------------------- */
+
+/* الكارت العائم فوق الهيرو */
+html[data-theme="dark"] .metal-floating-card{
+    background: rgba(28,28,28,.97);
+    box-shadow: 0 12px 30px rgba(0,0,0,.5);
+}
+
+html[data-theme="dark"] .metal-floating-card small{
+    color: var(--dm-text-mute);
+}
+
+/* المقدمة */
+html[data-theme="dark"] .metal-intro > p{
+    color: var(--dm-text-dim);
+}
+
+/* كروت المنتجات */
+html[data-theme="dark"] .metal-product-card{
+    background: var(--dm-surface);
+    box-shadow: 0 7px 25px rgba(0,0,0,.35);
+}
+
+html[data-theme="dark"] .metal-product-card:hover{
+    box-shadow: 0 15px 35px rgba(0,0,0,.5);
+}
+
+html[data-theme="dark"] .metal-product-info h3{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .metal-product-info p{
+    color: var(--dm-text-dim);
+}
+
+/* تصميم حسب الطلب */
+html[data-theme="dark"] .metal-custom{
+    background: var(--dm-surface);
+}
+
+html[data-theme="dark"] .metal-custom-content > p{
+    color: var(--dm-text-dim);
+}
+
+html[data-theme="dark"] .metal-custom-content li{
+    color: var(--dm-text-dim);
+}
+
+/* لماذا نحن */
+html[data-theme="dark"] .metal-features-grid{
+    border-top-color: var(--dm-border);
+}
+
+html[data-theme="dark"] .metal-feature{
+    border-left-color: var(--dm-border);
+}
+
+html[data-theme="dark"] .metal-feature p{
+    color: var(--dm-text-mute);
+}
+
+/* كيف نعمل */
+html[data-theme="dark"] .process-number{
+    background: var(--dm-surface);
+    box-shadow: 0 0 0 2px var(--dm-bg);
+}
+
+html[data-theme="dark"] .metal-process-item p{
+    color: var(--dm-text-mute);
+}
+:root{
+    --dm-bg:            #121212;
+    --dm-bg-alt:        #121212;
+    --dm-surface:       #1c1c1c;
+    --dm-surface-2:     #242424;
+    --dm-border:        #2e2e2e;
+    --dm-text:          #eef0f3;
+    --dm-text-dim:      #a8afba;
+    --dm-text-mute:     #7c8492;
+    --dm-gold:          #f5a914;
+    --dm-gold-dark:     #d98b00;
+}
+
+/* انتقال ناعم بين الوضعين لكل عنصر تقريباً */
+html.theme-ready,
+html.theme-ready *{
+    transition:
+        background-color .35s ease,
+        color .35s ease,
+        border-color .35s ease,
+        box-shadow .35s ease !important;
+}
+
+/* ---------------------------------------------------------------
+   2) الهيدر الثابت / المتحرك مع السكرول
+--------------------------------------------------------------- */
+.site-header{
+    position: sticky;
+    top: 0;
+    transition:
+        transform .35s ease,
+        box-shadow .3s ease,
+        background-color .3s ease,
+        height .3s ease;
+}
+
+.site-header.rw-scrolled{
+    box-shadow: 0 8px 30px rgba(0,0,0,.12);
+}
+
+.site-header.rw-hidden{
+    transform: translateY(-100%);
+}
+
+html[data-theme="dark"] .site-header.rw-scrolled{
+    box-shadow: 0 8px 30px rgba(0,0,0,.55);
+}
+
+/* ---------------------------------------------------------------
+   3) زر تبديل الوضع الداكن
+--------------------------------------------------------------- */
+.theme-toggle{
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #f4f4f4;
+    color: #333;
+
+    font-size: 16px;
+
+    border: 1px solid transparent;
+
+    transition:
+        background .3s ease,
+        color .3s ease,
+        transform .3s ease,
+        border-color .3s ease;
+}
+
+.theme-toggle:hover{
+    background: var(--gold, #f5a914);
+    color: #fff;
+    transform: translateY(-2px) rotate(15deg);
+}
+
+.theme-toggle .fa-sun{ display:none; }
+.theme-toggle .fa-moon{ display:inline-block; }
+
+html[data-theme="dark"] .theme-toggle{
+    background: var(--dm-surface-2);
+    color: var(--dm-gold);
+    border-color: var(--dm-border);
+}
+
+html[data-theme="dark"] .theme-toggle .fa-sun{ display:inline-block; }
+html[data-theme="dark"] .theme-toggle .fa-moon{ display:none; }
+
+/* زر الموبايل نفس السلوك بحجم مطابق لأزرار قائمة الموبايل */
+.mobile-nav-head .theme-toggle{
+    width: 42px;
+    height: 42px;
+    margin-left: 8px;
+}
+
+/* ---------------------------------------------------------------
+   4) عام: خلفية ونص الصفحة
+--------------------------------------------------------------- */
+html[data-theme="dark"] body{
+    background: var(--dm-bg);
+    color: var(--dm-text);
+}
+
+/* ---------------------------------------------------------------
+   5) الهيدر + التنقل
+--------------------------------------------------------------- */
+html[data-theme="dark"] .site-header{
+    background: rgba(13,15,19,0.92);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 5px 25px rgba(0,0,0,.35);
+}
+
+html[data-theme="dark"] .nav-link{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .nav-link:hover,
+html[data-theme="dark"] .nav-link.active{
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .mobile-menu-btn{
+    background: var(--dm-gold);
+}
+
+/* ---------------------------------------------------------------
+   6) الهيرو
+--------------------------------------------------------------- */
+html[data-theme="dark"] .hero-video-card{
+    background: var(--dm-surface);
+    box-shadow: 0 20px 50px rgba(0,0,0,.45);
+}
+
+html[data-theme="dark"] .video-info p{
+    color: var(--dm-text-dim);
+}
+
+html[data-theme="dark"] .slide-counter span:first-child{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .slide-counter span:last-child{
+    color: var(--dm-text-mute);
+}
+
+html[data-theme="dark"] .hero-social{
+    background: var(--dm-surface);
+}
+
+html[data-theme="dark"] .hero-social a{
+    background: var(--dm-surface-2);
+}
+
+/* ---------------------------------------------------------------
+   7) القائمة الجانبية للموبايل
+--------------------------------------------------------------- */
+html[data-theme="dark"] .mobile-nav{
+    background: var(--dm-bg-alt);
+    box-shadow: -15px 0 40px rgba(0,0,0,.5);
+}
+
+html[data-theme="dark"] .mobile-nav-head{
+    border-color: var(--dm-border);
+}
+
+html[data-theme="dark"] .mobile-nav-head button{
+    background: var(--dm-surface-2);
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .mobile-nav nav a{
+    color: var(--dm-text);
+    border-color: var(--dm-border);
+}
+
+html[data-theme="dark"] .mobile-nav nav a:hover{
+    color: var(--dm-gold);
+}
+
+/* ---------------------------------------------------------------
+   8) قسم الإحصائيات + من نحن
+--------------------------------------------------------------- */
+html[data-theme="dark"] .rw-stats-section,
+html[data-theme="dark"] .rw-about-section,
+html[data-theme="dark"] .rw-about-area{
+    background: var(--dm-bg);
+}
+
+html[data-theme="dark"] .rw-stat-number{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .rw-stat-title{
+    color: var(--dm-text-dim);
+}
+
+html[data-theme="dark"] .rw-stat-divider{
+    background: var(--dm-border);
+}
+
+html[data-theme="dark"] .rw-small-label{
+    background: #3a2f18;
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .rw-about-title,
+html[data-theme="dark"] .rw-about-left-title{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .rw-about-right p,
+html[data-theme="dark"] .rw-about-left p{
+    color: var(--dm-text-dim);
+}
+
+html[data-theme="dark"] .rw-manager-info strong,
+html[data-theme="dark"] .rw-manager-info span{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .rw-about-image{
+    background: var(--dm-surface);
+}
+
+/* ---------------------------------------------------------------
+   9) الخدمات المتخصصة
+--------------------------------------------------------------- */
+html[data-theme="dark"] .rw-special-services{
+    background: var(--dm-bg);
+}
+
+html[data-theme="dark"] .rw-services-header h2{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .rw-services-header p{
+    color: var(--dm-text-dim);
+}
+
+html[data-theme="dark"] .rw-service-info{
+    background: rgba(26,30,38,0.96);
+}
+
+html[data-theme="dark"] .rw-service-info h3{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .rw-service-info p{
+    color: var(--dm-text-dim);
+}
+
+/* ---------------------------------------------------------------
+   10) المنتجات
+--------------------------------------------------------------- */
+html[data-theme="dark"] .rw-products{
+    background: var(--dm-bg);
+}
+
+html[data-theme="dark"] .rw-products-header h2{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .rw-products-header p{
+    color: var(--dm-text-mute);
+}
+
+html[data-theme="dark"] .rw-product-image{
+    background: var(--dm-surface);
+}
+
+html[data-theme="dark"] .rw-product-title{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .rw-product-category{
+    color: var(--dm-text-mute);
+}
+
+html[data-theme="dark"] .rw-old-price{
+    color: var(--dm-text-mute);
+}
+
+html[data-theme="dark"] .rw-page-btn{
+    color: var(--dm-text-dim);
+}
+
+html[data-theme="dark"] .rw-page-btn:hover{
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .rw-page-arrow:hover{
+    background: var(--dm-surface-2);
+}
+
+html[data-theme="dark"] .rw-products-empty{
+    color: var(--dm-text-mute);
+}
+
+/* ---------------------------------------------------------------
+   11) خطوات العمل
+--------------------------------------------------------------- */
+html[data-theme="dark"] .process-section{
+    --text: #eef0f3;
+    background: var(--dm-bg);
+}
+
+html[data-theme="dark"] .step-icon{
+    border-color: var(--dm-bg);
+    box-shadow:
+        0 0 0 2px #6b4d18,
+        0 5px 16px rgba(0,0,0,.35);
+}
+
+html[data-theme="dark"] .process-timeline::before{
+    background: linear-gradient(to bottom, #6b4d18, #d98b00, #6b4d18);
+}
+
+/* ---------------------------------------------------------------
+   12) أحدث المشاريع
+--------------------------------------------------------------- */
+html[data-theme="dark"] .projects-section{
+    background: var(--dm-bg);
+}
+
+html[data-theme="dark"] .projects-header h2{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .projects-header p{
+    color: var(--dm-text-mute);
+}
+
+html[data-theme="dark"] .project-card{
+    background: var(--dm-surface);
+    box-shadow: 0 8px 25px rgba(0,0,0,.4);
+}
+
+html[data-theme="dark"] .project-info{
+    background: rgba(26,30,38,.97);
+    box-shadow: 0 12px 35px rgba(0,0,0,.5);
+}
+
+html[data-theme="dark"] .project-info h3{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .project-info p{
+    color: var(--dm-text-dim);
+}
+
+html[data-theme="dark"] .slider-btn{
+    background: var(--dm-surface-2);
+    color: var(--dm-gold);
+    box-shadow: 0 5px 25px rgba(0,0,0,.4);
+}
+
+html[data-theme="dark"] .projects-note p{
+    color: var(--dm-text-mute);
+}
+
+/* ---------------------------------------------------------------
+   13) المقالات
+--------------------------------------------------------------- */
+html[data-theme="dark"] .shadow-articles-section{
+    background: var(--dm-bg);
+}
+
+html[data-theme="dark"] .shadow-articles-header p{
+    color: var(--dm-text-dim);
+}
+
+html[data-theme="dark"] .shadow-article-media{
+    background: var(--dm-surface);
+}
+
+html[data-theme="dark"] .shadow-article-arrow{
+    background: rgba(32,36,46,.96);
+}
+
+html[data-theme="dark"] .shadow-article-arrow span{
+    border-color: var(--dm-text);
+}
+
+html[data-theme="dark"] .shadow-article-arrow:hover span{
+    border-color: #fff;
+}
+
+html[data-theme="dark"] .shadow-articles-more a{
+    background: var(--dm-surface);
+    border-color: var(--dm-gold);
+    color: var(--dm-gold);
+}
+
+/* ---------------------------------------------------------------
+   14) نطاق التغطية
+--------------------------------------------------------------- */
+html[data-theme="dark"] .coverage-section{
+    background: var(--dm-bg);
+}
+
+html[data-theme="dark"] .coverage-heading h2{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .coverage-heading p{
+    color: var(--dm-text-dim);
+}
+
+html[data-theme="dark"] .coverage-item p{
+    color: var(--dm-text-dim);
+}
+
+html[data-theme="dark"] .coverage-map::after{
+    background: rgba(0,0,0,.35);
+}
+
+/* ---------------------------------------------------------------
+   15) الفوتر
+--------------------------------------------------------------- */
+html[data-theme="dark"] .rz-footer{
+    background: var(--dm-bg-alt);
+    color: var(--dm-text-dim);
+    border-top-color: rgba(245,169,20,.12);
+}
+
+html[data-theme="dark"] .rz-contact-item{
+    color: var(--dm-text-dim);
+}
+
+html[data-theme="dark"] .rz-contact-item:hover{
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .rz-footer-button{
+    background: var(--dm-surface);
+    color: var(--dm-gold);
+    border-color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .rz-footer-button:hover{
+    background: var(--dm-gold);
+    color: #111;
+}
+
+html[data-theme="dark"] .rz-footer-nav a{
+    color: var(--dm-text-dim);
+}
+
+html[data-theme="dark"] .rz-footer-nav a:hover{
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .rz-social a{
+    color: var(--dm-gold);
+    border-color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .rz-social a:hover{
+    background: var(--dm-gold);
+    color: #111;
+}
+
+html[data-theme="dark"] .rz-copyright{
+    color: var(--dm-text-mute);
+}
+
+/* ---------------------------------------------------------------
+   16) الفيديو مودال — أصلاً غامق، تعديل بسيط فقط
+--------------------------------------------------------------- */
+html[data-theme="dark"] .video-close{
+    background: var(--dm-surface-2);
+    color: var(--dm-text);
+}
+
+/* ---------------------------------------------------------------
+   17) صفحة "من نحن" — الهيرو + قسم من نحن
+--------------------------------------------------------------- */
+html[data-theme="dark"] .rd-hero-about{
+    background: var(--dm-bg);
+}
+
+html[data-theme="dark"] .rd-decoration svg{
+    stroke: var(--dm-gold);
+    opacity: .8;
+}
+
+html[data-theme="dark"] .rd-about-content p{
+    color: var(--dm-text-dim);
+}
+html[data-theme="dark"] .step-content h3{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .process-title{
+    color: var(--dm-text);
+}
+html[data-theme="dark"] .site-header{
+    background: transparent;
+    box-shadow: none;
+}
+
+html[data-theme="dark"] .site-header.rw-scrolled{
+    background: rgba(13,15,19,0.92);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 5px 25px rgba(0,0,0,.35);
+}
+
+html[data-theme="dark"] .nav-link{
+    color: #fff;
+}
+
+html[data-theme="dark"] .site-header.rw-scrolled .nav-link{
+    color: var(--dm-text);
+}
+/* ---------------------------------------------------------------
+   18) صفحة "من نحن" — قسم خبراء المجال
+--------------------------------------------------------------- */
+html[data-theme="dark"] .exp-team-section{
+    background: var(--dm-bg);
+}
+
+html[data-theme="dark"] .exp-team-image{
+    background: var(--dm-bg);
+}
+
+/* الفيد الأبيض لازم يتحول لفيد بلون خلفية الوضع الداكن نفسه
+   عشان الصورة تندمج بدل ما يفضل مربع أبيض واضح حواليها */
+html[data-theme="dark"] .exp-team-fade{
+    background: linear-gradient(
+        to top,
+        var(--dm-bg) 0%,
+        rgba(13,15,19,.94) 22%,
+        rgba(13,15,19,.65) 50%,
+        rgba(13,15,19,0) 100%
+    );
+}
+
+html[data-theme="dark"] .exp-team-content p{
+    color: var(--dm-text-dim);
+}
+
+html[data-theme="dark"] .exp-team-button{
+    background: var(--dm-surface);
+    border-color: var(--dm-gold);
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .exp-team-card:hover .exp-team-button{
+    background: var(--dm-gold);
+    color: #111;
+}
+
+/* ---------------------------------------------------------------
+   19) صفحة "من نحن" — قسم رسالتنا
+--------------------------------------------------------------- */
+html[data-theme="dark"] .rw-message-section{
+    background: var(--dm-bg);
+}
+
+html[data-theme="dark"] .rw-message-content p{
+    color: var(--dm-text-dim);
+}
+
+/* ---------------------------------------------------------------
+   20) صفحة "من نحن" — قسم القيم (خلفية ذهبية أصلاً، نغمّقها شوية بس)
+--------------------------------------------------------------- */
+html[data-theme="dark"] .rw-values-section{
+    background: #a97a2f;
+}
+
+/* ---------------------------------------------------------------
+   22) صفحة "تصنيفاتنا" — الناف بار + الأقسام + المنتجات
+--------------------------------------------------------------- */
+html[data-theme="dark"] .navbar{
+    background: rgba(13,15,19,.96);
+    box-shadow: 0 4px 22px rgba(0,0,0,.4);
+}
+
+html[data-theme="dark"] .menu a{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .menu a:hover,
+html[data-theme="dark"] .menu a.active{
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .categories-title::before,
+html[data-theme="dark"] .categories-title::after{
+    background: var(--dm-border);
+}
+
+html[data-theme="dark"] .categories-title h2{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .category-badge{
+    background: radial-gradient(
+        circle at 50% 35%,
+        var(--dm-surface-2) 0%,
+        var(--dm-surface) 50%,
+        #2c2313 100%
+    );
+    border-color: var(--dm-gold-dark);
+    box-shadow:
+        0 12px 30px rgba(0,0,0,.35),
+        inset 0 0 0 5px rgba(255,255,255,.03);
+}
+
+html[data-theme="dark"] .category-badge::before{
+    border-color: rgba(217,139,0,.5);
+}
+
+html[data-theme="dark"] .category-badge::after{
+    border-color: rgba(217,139,0,.3);
+}
+
+html[data-theme="dark"] .category-icon{
+    background: linear-gradient(
+        145deg,
+        rgba(255,255,255,.04),
+        rgba(217,139,0,.06)
+    );
+    border-color: var(--dm-gold-dark);
+}
+
+html[data-theme="dark"] .category-name{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .category:hover .category-name,
+html[data-theme="dark"] .category.active .category-name{
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .products-heading{
+    border-color: var(--dm-border);
+}
+
+html[data-theme="dark"] .products-heading h2{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .products-heading span{
+    color: var(--dm-text-mute);
+}
+
+html[data-theme="dark"] .product-card{
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    box-shadow: 0 10px 30px rgba(0,0,0,.35);
+}
+
+html[data-theme="dark"] .product-card:hover{
+    border-color: var(--dm-gold-dark);
+    box-shadow: 0 25px 50px rgba(0,0,0,.5);
+}
+
+html[data-theme="dark"] .product-img{
+    background: radial-gradient(
+        circle at 50% 35%,
+        var(--dm-surface-2) 0%,
+        var(--dm-surface) 60%,
+        var(--dm-bg-alt) 100%
+    );
+}
+
+html[data-theme="dark"] .product-category-tag{
+    background: rgba(217,139,0,.12);
+    border-color: var(--dm-gold-dark);
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .product-info h3{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .product-card:hover .product-info h3{
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .product-info p{
+    color: var(--dm-text-dim);
+}
+
+html[data-theme="dark"] .product-info{
+    background: var(--dm-surface);
+}
+
+html[data-theme="dark"] .product-footer{
+    border-color: var(--dm-border);
+}
+
+html[data-theme="dark"] .price{
+    background: linear-gradient(135deg, rgba(217,139,0,.18), rgba(217,139,0,.10));
+    border-color: var(--dm-gold-dark);
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .price-old{
+    color: var(--dm-text-mute);
+}
+
+html[data-theme="dark"] .all-products a{
+    background: var(--dm-surface);
+    border-color: var(--dm-gold-dark);
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .all-products a:hover{
+    background: var(--dm-gold);
+    color: #111;
+    border-color: var(--dm-gold);
+}
+
+/* ---------------------------------------------------------------
+   23) صفحة "خدماتنا" — الهيرو + المقدمة + الكروت + لماذا نحن
+--------------------------------------------------------------- */
+
+/* HERO */
+html[data-theme="dark"] .services-hero{
+    background: #000;
+}
+
+html[data-theme="dark"] .breadcrumb span{
+    color: var(--dm-text-mute);
+}
+
+/* INTRO */
+html[data-theme="dark"] .services-intro{
+    background: var(--dm-bg);
+}
+
+html[data-theme="dark"] .section-heading h2{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .section-description{
+    color: var(--dm-text-dim);
+}
+
+/* SERVICE CARDS */
+html[data-theme="dark"] .services-cards{
+    background: var(--dm-bg);
+}
+
+html[data-theme="dark"] .service-card{
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    box-shadow: 0 8px 30px rgba(0,0,0,.35);
+}
+
+html[data-theme="dark"] .service-card:hover{
+    box-shadow: 0 18px 40px rgba(0,0,0,.5);
+}
+
+html[data-theme="dark"] .service-icon{
+    background: var(--dm-surface-2);
+    border-color: var(--dm-border);
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .service-card:hover .service-icon{
+    background: var(--dm-gold);
+    color: #111;
+    border-color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .service-number{
+    color: #3a3020;
+}
+
+html[data-theme="dark"] .service-card h3{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .service-card p{
+    color: var(--dm-text-dim);
+}
+
+html[data-theme="dark"] .service-link{
+    background: var(--dm-surface);
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .service-link:hover{
+    color: #fff;
+}
+
+/* WHY US */
+html[data-theme="dark"] .why-us{
+    background: var(--dm-bg-alt);
+}
+
+html[data-theme="dark"] .why-us::before{
+    border-color: rgba(245,169,20,.12);
+}
+
+html[data-theme="dark"] .why-content h2{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .why-content h2 strong{
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .why-content > p{
+    color: var(--dm-text-dim);
+}
+
+html[data-theme="dark"] .why-feature{
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+}
+
+html[data-theme="dark"] .why-feature:hover{
+    border-color: var(--dm-gold-dark);
+    box-shadow: 0 12px 30px rgba(0,0,0,.4);
+}
+
+html[data-theme="dark"] .feature-icon{
+    background: rgba(245,169,20,.10);
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .why-feature h3{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .why-feature p{
+    color: var(--dm-text-dim);
+}
+
+/* ---------------------------------------------------------------
+   24) بادج سلة المشتريات في الهيدر
+--------------------------------------------------------------- */
+html[data-theme="dark"] .cart-count{
+    background: var(--dm-gold);
+    color: #111;
+    box-shadow: 0 4px 10px rgba(0,0,0,.4);
+}
+
+html[data-theme="dark"] .cart-badge{
+    color: var(--dm-text);
+}
+
+/* ---------------------------------------------------------------
+   21) موبايل — تصغير زر الوضع الداكن قليلاً
+--------------------------------------------------------------- */
+@media (max-width: 600px){
+    .theme-toggle{
+        width: 40px;
+        height: 40px;
+        font-size: 14px;
+    }
+}
+/* ---------------------------------------------------------------
+   25) صفحة "المتجر" — العنوان + البحث + الفلتر + كارت المنتج
+--------------------------------------------------------------- */
+
+html[data-theme="dark"] .store-heading h1{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .store-heading p{
+    color: var(--dm-text-mute);
+}
+
+html[data-theme="dark"] .store-search-box i{
+    color: var(--dm-text-mute);
+}
+
+html[data-theme="dark"] #storeSearch{
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] #storeSearch::placeholder{
+    color: var(--dm-text-mute);
+}
+
+html[data-theme="dark"] #storeSearch:focus{
+    border-color: var(--dm-gold);
+}
+
+html[data-theme="dark"] #storeCategoryFilter{
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .rw-product-card{
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+}
+
+html[data-theme="dark"] .rw-product-card:hover{
+    box-shadow: 0 14px 30px rgba(0,0,0,.45);
+}
+
+html[data-theme="dark"] .rw-product-badge{
+    background: #b23c3c;
+}
+
+html[data-theme="dark"] .rw-product-overlay{
+    background: rgba(0,0,0,0.5);
+}
+
+html[data-theme="dark"] .rw-overlay-btn{
+    background: var(--dm-surface-2);
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .rw-overlay-btn:hover{
+    background: var(--dm-gold);
+    color: #111;
+}
+
+html[data-theme="dark"] .rw-product-category{
+    background: #3a2f18;
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .rw-sale-price{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .rw-add-cart{
+    background: var(--dm-surface-2);
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .rw-add-cart:hover,
+html[data-theme="dark"] .rw-add-cart.added{
+    background: var(--dm-gold);
+    color: #111;
+}
+
+html[data-theme="dark"] .rw-page-btn{
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: var(--dm-text-dim);
+}
+
+html[data-theme="dark"] .rw-page-btn.active{
+    background: var(--dm-gold);
+    color: #111;
+    border-color: var(--dm-gold);
+}
+/* ---------------------------------------------------------------
+   26) صفحة "سلة المشتريات" — العناصر + الملخص + زر الإتمام
+--------------------------------------------------------------- */
+
+html[data-theme="dark"] .cart-page h1{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .cart-item{
+    background: var(--dm-surface);
+    box-shadow: 0 3px 14px rgba(0,0,0,.35);
+}
+
+html[data-theme="dark"] .cart-item img{
+    background: var(--dm-surface-2);
+}
+
+html[data-theme="dark"] .cart-item-title{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .cart-item-price{
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .cart-item-qty{
+    border-color: var(--dm-border);
+}
+
+html[data-theme="dark"] .cart-item-qty button{
+    background: var(--dm-surface-2);
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .cart-item-qty input{
+    background: transparent;
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .cart-item-remove{
+    color: #e05c5c;
+}
+
+html[data-theme="dark"] .cart-empty{
+    color: var(--dm-text-mute);
+}
+
+html[data-theme="dark"] .cart-empty a{
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .cart-summary{
+    background: var(--dm-surface);
+    box-shadow: 0 3px 14px rgba(0,0,0,.35);
+}
+
+html[data-theme="dark"] .cart-summary-row{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .cart-checkout-btn{
+    box-shadow: 0 8px 20px rgba(0,0,0,.4);
+}
+/* =========================================================
+   HERO — دارك مود لنسخة الموبايل/التابلت
+   يُضاف كملف مستقل بعد الكود اللي فوق، مايعدلش على حاجة
+========================================================= */
+
+@media (max-width: 950px) {
+
+    html[data-theme="dark"] .hero-section{
+        box-shadow: 0 20px 50px rgba(0,0,0,.5);
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    html[data-theme="dark"] .hero-video-card{
+        background: var(--dm-surface);
+        box-shadow: 0 12px 30px rgba(0,0,0,.45);
+    }
+
+    html[data-theme="dark"] .video-preview{
+        background: var(--dm-surface-2);
+    }
+
+    html[data-theme="dark"] .play-button{
+        background: var(--dm-gold);
+        color: #111;
+    }
+
+    html[data-theme="dark"] .video-info p{
+        color: var(--dm-text-dim);
+    }
+
+    html[data-theme="dark"] .slide-counter span:first-child{
+        color: var(--dm-text);
+    }
+
+    html[data-theme="dark"] .slide-counter span:last-child{
+        color: var(--dm-text-mute);
+    }
+
+    html[data-theme="dark"] .hero-social{
+        background: var(--dm-surface);
+        box-shadow: 0 8px 20px rgba(0,0,0,.4);
+    }
+
+    html[data-theme="dark"] .hero-social a{
+        background: var(--dm-surface-2);
+        color: var(--dm-text);
+    }
+
+    html[data-theme="dark"] .slider-controls button{
+        background: var(--dm-surface-2);
+        color: var(--dm-gold);
+        box-shadow: 0 4px 14px rgba(0,0,0,.4);
+    }
+
+    html[data-theme="dark"] .hero-dot{
+        background: rgba(255,255,255,.25);
+    }
+
+    html[data-theme="dark"] .hero-dot.active{
+        background: var(--dm-gold);
+    }
+
+    html[data-theme="dark"] .hero-label{
+        background: var(--dm-surface-2);
+        color: var(--dm-gold);
+        border-color: var(--dm-border);
+    }
+
+}
+
+@media (max-width: 400px) {
+
+    html[data-theme="dark"] .hero-video-card{
+        box-shadow: 0 10px 24px rgba(0,0,0,.45);
+    }
+
+}
+
+/* =========================================================
+   PROCESS SECTION — دارك مود لكارت النص في الموبايل (900px وتحت)
+========================================================= */
+
+@media (max-width: 900px){
+
+    html[data-theme="dark"] .process-section{
+        background: var(--dm-bg);
+    }
+
+    html[data-theme="dark"] .step-content{
+        background: var(--dm-surface);
+        border-color: var(--dm-border);
+        box-shadow: 0 6px 20px rgba(0,0,0,.35);
+    }
+
+    html[data-theme="dark"] .step-content h3{
+        color: var(--dm-text);
+    }
+
+    html[data-theme="dark"] .process-step:hover .step-content h3{
+        color: var(--dm-gold);
+    }
+
+    /* رقم الخطوة الصغير أعلى الأيقونة */
+    html[data-theme="dark"] .process-step::before{
+        background: var(--dm-surface);
+        color: var(--dm-gold);
+        border-color: var(--dm-gold);
+    }
+
+    /* حلقة الخلفية حوالين الأيقونة لازم تتغير للون خلفية القسم الغامق */
+    html[data-theme="dark"] .step-icon{
+        box-shadow: 0 0 0 5px var(--dm-bg), 0 0 0 6px #6b4d18, 0 6px 16px rgba(0,0,0,.4);
+    }
+
+}
+html[data-theme="dark"] .mobile-cart-btn{
+    background: var(--dm-surface-2);
+    color: var(--dm-gold);
+    border: 1px solid var(--dm-border);
+}
+
+html[data-theme="dark"] .mobile-cart-count{
+    border-color: var(--dm-bg);
+}
+
+html[data-theme="dark"] .mobile-menu-btn{
+    background: var(--dm-gold);
+    color: #111;
+}
+@media (max-width: 1300px){
+
+    html[data-theme="dark"] .cart-badge{
+        background: var(--dm-surface-2);
+        color: var(--dm-gold);
+        border: 1px solid var(--dm-border);
+    }
+
+    html[data-theme="dark"] .cart-badge .cart-count{
+        border-color: var(--dm-bg);
+    }
+
+}
+html[data-theme="dark"] .cart-badge{
+    background: var(--dm-surface-2);
+    color: var(--dm-gold);
+    border: 1px solid var(--dm-border);
+}
+
+html[data-theme="dark"] .cart-badge .cart-count{
+    border-color: var(--dm-bg);
+}
+html[data-theme="dark"] .mobile-menu-btn{
+    background: var(--dm-gold);
+    color: #111;
+}
+html[data-theme="dark"] .navbar{
+    background: rgba(13,15,19,.96);
+    box-shadow: 0 4px 22px rgba(0,0,0,.4);
+}
+
+html[data-theme="dark"] .menu a{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .menu a:hover,
+html[data-theme="dark"] .menu a.active{
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .menu-cart-badge{
+    background: var(--dm-surface-2);
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .mobile-nav{
+    background: var(--dm-bg-alt);
+}
+
+html[data-theme="dark"] .mobile-nav-head button{
+    background: var(--dm-surface-2);
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .mobile-nav nav a{
+    color: var(--dm-text);
+    border-color: var(--dm-border);
+}
+
+/* =========================================================
+   27) صفحات تفاصيل الخدمة (سواتر / شماسي / أثاث / كريتال / منشآت)
+   نفس بنية الكروت (.shade-card / .shades-cta / .features-grid)
+   متكررة في كل صفحات الخدمة، فالقواعد دي شغالة عليهم كلهم
+========================================================= */
+
+/* الخلفية العامة للصفحة */
+html[data-theme="dark"] .shades-page{
+    background: var(--dm-bg);
+    color: var(--dm-text-dim);
+}
+
+/* عناوين الأقسام */
+html[data-theme="dark"] .shades-page .section-heading h2{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .shades-page .section-description{
+    color: var(--dm-text-dim);
+}
+
+/* كارت جانبي فوق صورة الهيرو */
+html[data-theme="dark"] .shades-floating-card{
+    background: rgba(28,28,28,.97);
+    box-shadow: 0 12px 30px rgba(0,0,0,.5);
+}
+
+html[data-theme="dark"] .shades-floating-card strong{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .shades-floating-card small{
+    color: var(--dm-text-mute);
+}
+
+/* كروت السواتر/المنتجات في شبكة .shades-grid */
+html[data-theme="dark"] .shade-card{
+    background: var(--dm-surface);
+    box-shadow: 0 8px 25px rgba(0,0,0,.35);
+}
+
+html[data-theme="dark"] .shade-card:hover{
+    box-shadow: 0 15px 35px rgba(0,0,0,.5);
+}
+
+html[data-theme="dark"] .shade-card-title{
+    background: rgba(28,28,28,.96);
+    color: var(--dm-text);
+}
+
+/* شريط المميزات */
+html[data-theme="dark"] .features-grid{
+    border-top-color: var(--dm-border);
+}
+
+html[data-theme="dark"] .feature{
+    border-left-color: var(--dm-border);
+}
+
+html[data-theme="dark"] .feature h3{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .feature p{
+    color: var(--dm-text-mute);
+}
+
+/* بطاقة الدعوة لإجراء (تواصل معنا) */
+html[data-theme="dark"] .shades-cta{
+    background: var(--dm-surface);
+}
+
+html[data-theme="dark"] .cta-content h2{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .cta-content p{
+    color: var(--dm-text-dim);
+}
+
+/* حدود شبكة المميزات في التابلت والموبايل بعد ما بتتغير */
+@media (max-width: 900px){
+    html[data-theme="dark"] .feature:nth-child(3){
+        border-left-color: var(--dm-border);
+    }
+}
+
+@media (max-width: 600px){
+    html[data-theme="dark"] .feature{
+        border-left-color: var(--dm-border);
+        border-bottom-color: var(--dm-border);
+    }
+}
+/* ---------------------------------------------------------------
+   31) صفحة "الكريتال والفورجيه" (.kretal-*)
+--------------------------------------------------------------- */
+
+/* الكارت العائم فوق الهيرو */
+html[data-theme="dark"] .kretal-floating-card{
+    background: rgba(28,28,28,.97);
+    box-shadow: 0 12px 30px rgba(0,0,0,.5);
+}
+
+html[data-theme="dark"] .kretal-floating-card small{
+    color: var(--dm-text-mute);
+}
+
+/* المقدمة */
+html[data-theme="dark"] .kretal-intro p{
+    color: var(--dm-text-dim);
+}
+
+/* كروت الخدمات */
+html[data-theme="dark"] .kretal-card{
+    background: var(--dm-surface);
+    box-shadow: 0 7px 25px rgba(0,0,0,.35);
+}
+
+html[data-theme="dark"] .kretal-card:hover{
+    box-shadow: 0 15px 35px rgba(0,0,0,.5);
+}
+
+html[data-theme="dark"] .kretal-info h3{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .kretal-info p{
+    color: var(--dm-text-dim);
+}
+
+/* القسم المميز (لمسة فنية مصممة لك) */
+html[data-theme="dark"] .kretal-featured{
+    background: var(--dm-surface);
+}
+
+html[data-theme="dark"] .kretal-featured-content > p{
+    color: var(--dm-text-dim);
+}
+
+html[data-theme="dark"] .kretal-points div{
+    color: var(--dm-text-dim);
+}
+
+/* مميزات أعمالنا */
+html[data-theme="dark"] .kretal-features-grid{
+    border-top-color: var(--dm-border);
+}
+
+html[data-theme="dark"] .kretal-feature{
+    border-left-color: var(--dm-border);
+}
+
+html[data-theme="dark"] .kretal-feature p{
+    color: var(--dm-text-mute);
+}
+
+/* كيف نعمل */
+html[data-theme="dark"] .kretal-process-item > div{
+    background: var(--dm-surface);
+    box-shadow: 0 0 0 2px var(--dm-bg);
+}
+
+html[data-theme="dark"] .kretal-process-item p{
+    color: var(--dm-text-mute);
+}
+/* ---------------------------------------------------------------
+   32) صفحة المتجر — تكملة (.store-page)
+--------------------------------------------------------------- */
+
+html[data-theme="dark"] .rw-product-card{
+    border-color: var(--dm-border);
+}
+
+html[data-theme="dark"] .rw-page-arrow:hover{
+    background: var(--dm-surface-2);
+}
+/* ---------------------------------------------------------------
+   33) صفحة "تفاصيل المنتج" (.pd-*)
+--------------------------------------------------------------- */
+
+html[data-theme="dark"] .pd-loading,
+html[data-theme="dark"] .pd-not-found{
+    color: var(--dm-text-mute);
+}
+
+html[data-theme="dark"] .pd-breadcrumb{
+    color: var(--dm-text-mute);
+}
+
+html[data-theme="dark"] .pd-breadcrumb a{
+    color: var(--dm-text-mute);
+}
+
+html[data-theme="dark"] .pd-breadcrumb a:hover{
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .pd-media{
+    background: var(--dm-surface);
+}
+
+html[data-theme="dark"] .pd-category{
+    background: #3a2f18;
+    color: var(--dm-gold);
+}
+
+html[data-theme="dark"] .pd-title{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .pd-price-now{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .pd-price-old{
+    color: var(--dm-text-mute);
+}
+
+html[data-theme="dark"] .pd-description{
+    color: var(--dm-text-dim);
+}
+
+html[data-theme="dark"] .pd-qty-row label{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .pd-qty-control{
+    border-color: var(--dm-border);
+}
+
+html[data-theme="dark"] .pd-qty-control button{
+    background: var(--dm-surface-2);
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .pd-qty-control input{
+    background: transparent;
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .pd-btn-cart{
+    background: var(--dm-surface-2);
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .pd-btn-whatsapp-contact,
+html[data-theme="dark"] .pd-btn-whatsapp-order{
+    filter: brightness(.92);
+}
+
+html[data-theme="dark"] .pd-added-msg{
+    background: rgba(22,163,74,.15);
+    color: #4ade80;
+}
+
+
+/* ---------------------------------------------------------------
+   34) صفحة "أنظمة التظليل الحديثة" (.modern-*)
+--------------------------------------------------------------- */
+
+html[data-theme="dark"] .modern-shades-page{
+    background: var(--dm-bg);
+    color: var(--dm-text-dim);
+}
+
+/* عنوان الأقسام */
+html[data-theme="dark"] .modern-section-title h2{
+    color: var(--dm-text);
+}
+
+/* المقدمة */
+html[data-theme="dark"] .modern-intro > p{
+    color: var(--dm-text-dim);
+}
+
+/* كروت الخدمات */
+html[data-theme="dark"] .modern-service-card{
+    background: var(--dm-surface);
+    box-shadow: 0 7px 25px rgba(0,0,0,.35);
+}
+
+html[data-theme="dark"] .modern-service-card:hover{
+    box-shadow: 0 15px 35px rgba(0,0,0,.5);
+}
+
+html[data-theme="dark"] .modern-service-info h3{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .modern-service-info p{
+    color: var(--dm-text-mute);
+}
+
+/* الكارت العائم فوق الهيرو */
+html[data-theme="dark"] .modern-floating-card{
+    background: rgba(28,28,28,.97);
+    box-shadow: 0 12px 30px rgba(0,0,0,.5);
+}
+
+html[data-theme="dark"] .modern-floating-card strong{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .modern-floating-card small{
+    color: var(--dm-text-mute);
+}
+
+/* المميزات */
+html[data-theme="dark"] .modern-features-grid{
+    border-top-color: var(--dm-border);
+}
+
+html[data-theme="dark"] .modern-feature{
+    border-left-color: var(--dm-border);
+}
+
+html[data-theme="dark"] .modern-feature h3{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .modern-feature p{
+    color: var(--dm-text-mute);
+}
+
+/* خطوات العمل */
+html[data-theme="dark"] .process-icon{
+    background: var(--dm-surface);
+}
+
+html[data-theme="dark"] .process-item h3{
+    color: var(--dm-text);
+}
+
+html[data-theme="dark"] .process-item p{
+    color: var(--dm-text-mute);
+}
+
+/* زر "اطلب عرض سعر" في الهيرو */
+html[data-theme="dark"] .modern-main-btn{
+    background: var(--dm-surface-2);
+    color: var(--dm-text);
+}
+
+/* حدود الشبكات في التابلت والموبايل */
+@media (max-width: 900px){
+    html[data-theme="dark"] .modern-feature:nth-child(2){
+        border-left-color: var(--dm-border);
+    }
+}
