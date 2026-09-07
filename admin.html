@@ -865,7 +865,832 @@
 
 <!-- Toast -->
 <div class="toast" id="toast"></div>
+<!--
+=====================================================================
+ إصلاح أداة "فحص السيو" — رواد الظل
+=====================================================================
+المشكلة اللي كانت موجودة في admin.html:
+- كان فيه 4 بلوكات <script> منفصلة، كلها بتعمل نفس حاجة الفحص و SERP preview
+  والكلمات المفتاحية (نسخ فوق بعض من مراحل تعديل مختلفة).
+- ده كان بيسبب: تكرار في الأحداث (event listeners)، معاينة جوجل بتتضاف
+  أكتر من مرة، وقسم الكلمات المفتاحية بيتبني أكتر من مرة، وده بيبطّئ
+  الصفحة ويعمل تعارض بصري أحياناً.
+- كمان الكلمات المقترحة أوتوماتيك كانت محدودة جداً (5 صفحات بس) ومش
+  شايلة كل مجالات الشركة الحقيقية.
 
+الحل: امسح الأربع بلوكات <script> اللي بعد آخر </section> وقبل </body>
+(اللي بيبدأوا بـ seoCheckPageSelect / seoCheckRunBtn) من ملف admin.html،
+وحط بلوكة <script> واحدة بس، وهي دي تحت. مفيش أي تغيير في admin.css
+أو admin.js — الإصلاح هنا في ملف الـ HTML بس.
+=====================================================================
+-->
+<script>
+(function () {
+  "use strict";
+
+  const pageSelect = document.getElementById('seoCheckPageSelect');
+  const customWrap  = document.getElementById('seoCheckCustomWrap');
+  const customPath  = document.getElementById('seoCheckCustomPath');
+  const runBtn      = document.getElementById('seoCheckRunBtn');
+  const resultsBox  = document.getElementById('seoCheckResults');
+
+  if (!runBtn) return;
+
+  const STORAGE_PREFIX = 'seoKeywords_';
+
+  injectStyles(); // تنسيق ذاتي مدمج - مش معتمد على admin.css عشان نضمن الشكل حتى لو الكاش قديم
+
+  pageSelect.addEventListener('change', function () {
+    customWrap.style.display = (pageSelect.value === '__custom__') ? 'block' : 'none';
+  });
+
+  runBtn.addEventListener('click', runFullCheck);
+
+  async function runFullCheck() {
+    let path = pageSelect.value === '__custom__' ? (customPath.value || '').trim() : pageSelect.value;
+    if (!path) { alert('اكتب مسار الصفحة الأول'); return; }
+
+    resultsBox.innerHTML = '<div class="seo-loading">جاري فحص الصفحة...</div>';
+
+    let html, doc;
+    try {
+      const res = await fetch(path, { cache: 'no-store' });
+      if (!res.ok) {
+        resultsBox.innerHTML = errorBox('الصفحة مش راضية تفتح (كود ' + res.status + ').');
+        return;
+      }
+      html = await res.text();
+      doc = new DOMParser().parseFromString(html, 'text/html');
+    } catch (err) {
+      resultsBox.innerHTML = errorBox('حصل خطأ في تحميل الصفحة: ' + err.message);
+      return;
+    }
+
+    const pageSlug = (path.split('/').pop() || 'الصفحة').replace('.html', '');
+    const checks = runAllChecks(doc, html, path, pageSlug);
+
+resultsBox.innerHTML =
+  buildSerpPreview(doc, path) +
+  buildScoreHeader(checks) +
+  buildChecksList(checks) +
+  buildKeywordSection(path);
+
+bindFixButtons();
+bindKeywordSection(path, doc);
+
+    if (getKeywords(path).length === 0) {
+      saveKeywords(path, generateSuggestions(doc, path));
+    }
+    renderChips(path);
+  }
+
+  /* ================= الفحوصات ================= */
+
+  function runAllChecks(doc, html, path, slug) {
+    const checks = [];
+
+    const title = (doc.querySelector('title') || {}).textContent || '';
+    checks.push(evalTitle(title, slug));
+
+    const metaDesc = doc.querySelector('meta[name="description"]');
+    checks.push(evalMetaDescription(metaDesc ? metaDesc.getAttribute('content') : '', slug));
+
+    const canonical = doc.querySelector('link[rel="canonical"]');
+    checks.push(evalCanonical(canonical, path));
+
+    const h1s = doc.querySelectorAll('h1');
+    checks.push(evalH1(h1s));
+
+    const imgs = Array.from(doc.querySelectorAll('img'));
+    checks.push(evalImagesAlt(imgs));
+    checks.push(evalExternalImages(imgs));
+
+    const bodyText = (doc.body ? doc.body.innerText || doc.body.textContent : '') || '';
+    checks.push(evalWordCount(bodyText, slug));
+
+    const schemas = doc.querySelectorAll('script[type="application/ld+json"]');
+    checks.push(evalSchema(schemas, slug));
+
+    checks.push(evalHtmlStructure(html));
+    checks.push(evalWhatsappLinks(doc));
+
+    return checks;
+  }
+
+  function item(level, title, desc, fixCode, fixNote, applyField, applyValue) {
+    return { level, title, desc, fixCode, fixNote, applyField, applyValue };
+  }
+
+  /* اقتراحات محتوى حقيقية (مش placeholders فاضية) — مبنية على خدمة
+     الصفحة الفعلية من PAGE_SERVICE_MAP، عشان "اقترح الإصلاح" يديك
+     نص جاهز تحسين حقيقي تقدر تطبّقه فعلاً، مش بس شكل فاضي بين [ ]. */
+
+  function suggestedTitleFor(slug) {
+    const mapped = PAGE_SERVICE_MAP[slug] || DEFAULT_SERVICE;
+    let t = 'رواد الظل | ' + mapped.ar + ' في مصر - جودة وتركيب احترافي';
+    if (t.length > 65) t = 'رواد الظل | ' + mapped.ar + ' في مصر';
+    return t;
+  }
+
+  function suggestedDescriptionFor(slug) {
+    const mapped = PAGE_SERVICE_MAP[slug] || DEFAULT_SERVICE;
+    const altText = (mapped.alt || []).slice(0, 2).join(' و');
+    let d = 'رواد الظل شركة متخصصة في ' + mapped.ar +
+      (altText ? ' و' + altText : '') +
+      ' بأعلى جودة وأسعار مناسبة في طنطا والغربية ومصر. تواصل معنا الآن لعرض سعر مجاني وتركيب سريع.';
+    if (d.length > 165) {
+      d = 'رواد الظل شركة متخصصة في ' + mapped.ar + ' بأعلى جودة وأسعار مناسبة في مصر. تواصل معنا لعرض سعر مجاني.';
+    }
+    return d;
+  }
+
+  function evalTitle(title, slug) {
+    const len = title.trim().length;
+    const suggested = suggestedTitleFor(slug);
+    if (!title.trim()) return item('bad', 'عنوان الصفحة (Title)', 'مفيش عنوان أصلاً.',
+      '<title>' + escapeHtml(suggested) + '</title>',
+      'ده عنوان جاهز مبني على خدمة الصفحة، عدّله بأسلوبك لو حابب قبل ما تحفظه.',
+      'metaTitle', suggested);
+    if (len < 30 || len > 65) return item('warning', 'عنوان الصفحة (Title)', 'الطول مش مثالي (' + len + ' حرف). الحالي: "' + title.trim() + '"',
+      '<title>' + escapeHtml(suggested) + '</title>',
+      'ده اقتراح لعنوان بديل بطول مناسب، بدل العنوان الحالي.',
+      'metaTitle', suggested);
+    return item('good', 'عنوان الصفحة (Title)', 'طول مناسب (' + len + ' حرف).');
+  }
+
+  function evalMetaDescription(desc, slug) {
+    const suggested = suggestedDescriptionFor(slug);
+    if (!desc) return item('bad', 'وصف الصفحة (Meta Description)', 'مفيش meta description.',
+      '<meta name="description" content="' + escapeHtml(suggested) + '">',
+      'ده وصف جاهز ومحسّن مبني على خدمة الصفحة، عدّله بأسلوبك قبل ما تحفظه.',
+      'metaDescription', suggested);
+    const len = desc.trim().length;
+    if (len < 70 || len > 165) return item('warning', 'وصف الصفحة (Meta Description)', 'الطول مش مثالي (' + len + ' حرف).',
+      '<meta name="description" content="' + escapeHtml(suggested) + '">',
+      'ده نسخة محسّنة بديلة عن الوصف الحالي بطول مناسب.',
+      'metaDescription', suggested);
+    return item('good', 'وصف الصفحة (Meta Description)', 'طول مناسب (' + len + ' حرف).');
+  }
+
+  function evalCanonical(canonical, path) {
+    if (!canonical || !canonical.getAttribute('href')) {
+      const guess = 'https://rowadalthil.com' + (path.startsWith('/') ? path : '/' + path);
+      return item('bad', 'رابط Canonical', 'مفيش canonical.', '<link rel="canonical" href="' + guess + '">');
+    }
+    return item('good', 'رابط Canonical', 'موجود ويشير إلى: ' + canonical.getAttribute('href'));
+  }
+
+  function evalH1(h1s) {
+    if (h1s.length === 0) return item('bad', 'عنوان H1', 'مفيش H1.', '<h1>[العنوان الرئيسي للصفحة]</h1>');
+    if (h1s.length > 1) return item('warning', 'عنوان H1', 'فيه ' + h1s.length + ' H1، لازم واحد بس.',
+      Array.from(h1s).slice(1).map(h => '<h2>' + escapeHtml(h.textContent.trim()) + '</h2>').join('\n'),
+      'خلي أول H1 زي ما هو، غيّر الباقي لـ H2.');
+    return item('good', 'عنوان H1', 'واحد بس، تمام.');
+  }
+
+  function evalImagesAlt(imgs) {
+    const missing = imgs.filter(img => !img.getAttribute('alt') || !img.getAttribute('alt').trim());
+    if (imgs.length === 0) return item('warning', 'نص بديل للصور (Alt)', 'مفيش صور في الصفحة.');
+    if (missing.length === 0) return item('good', 'نص بديل للصور (Alt)', 'كل الصور (' + imgs.length + ') عندها alt.');
+    const fixes = missing.slice(0, 8).map(img => {
+      const src = (img.getAttribute('src') || '').split('/').pop();
+      return '<img src="' + escapeHtml(img.getAttribute('src') || '') + '" alt="[وصف: ' + escapeHtml(src) + ']">';
+    }).join('\n');
+    return item('bad', 'نص بديل للصور (Alt)', missing.length + ' صورة من غير alt.', fixes, 'استبدل [ ] بوصف حقيقي قصير لكل صورة.');
+  }
+
+  function evalExternalImages(imgs) {
+    let siteHost; try { siteHost = window.location.hostname; } catch (e) { siteHost = ''; }
+    const external = imgs.filter(img => {
+      const src = img.getAttribute('src') || '';
+      if (!src.startsWith('http')) return false;
+      try { return siteHost && new URL(src).hostname !== siteHost; } catch (e) { return false; }
+    });
+    if (external.length === 0) return item('good', 'مصدر الصور', 'كل الصور من سيرفرك.');
+    return item('bad', 'مصدر الصور', external.length + ' صورة مسحوبة من مواقع خارجية.',
+      external.map(img => '- ' + img.src).join('\n'),
+      'نزّل الصور دي من موقعك، ارفعها إنت على السيرفر، وغيّر src بمسار الصورة الجديدة.');
+  }
+
+  function evalWordCount(text, slug) {
+    const count = text.trim().split(/\s+/).filter(Boolean).length;
+    if (count < 300) return item(count < 150 ? 'bad' : 'warning', 'طول المحتوى', 'المحتوى ' + (count < 150 ? 'قصير جدًا' : 'متوسط') + ' (' + count + ' كلمة).',
+      null, 'محتاج كتابة حقيقية لصفحة ' + slug + '.html، مش هينفع يتولّد أوتوماتيك بجودة كويسة.');
+    return item('good', 'طول المحتوى', 'المحتوى كافي (' + count + ' كلمة).');
+  }
+
+  function evalSchema(schemas, slug) {
+    if (schemas.length === 0) {
+      const example = '<script type="application/ld+json">\n' + JSON.stringify({
+        "@context": "https://schema.org", "@type": "LocalBusiness", "name": "رواد الظل",
+        "url": "https://rowadalthil.com/" + slug + ".html", "telephone": "[رقم الواتساب]",
+        "address": { "@type": "PostalAddress", "addressLocality": "طنطا", "addressCountry": "EG" }
+      }, null, 2) + '\n<\/script>';
+      return item('warning', 'بيانات Schema (JSON-LD)', 'مفيش Schema.', example, 'استبدل [رقم الواتساب] برقمك الحقيقي.');
+    }
+    let validCount = 0;
+    schemas.forEach(s => { try { JSON.parse(s.textContent); validCount++; } catch (e) {} });
+    if (validCount < schemas.length) return item('bad', 'بيانات Schema (JSON-LD)', 'فيه Schema بها خطأ JSON.');
+    return item('good', 'بيانات Schema (JSON-LD)', schemas.length + ' Schema صحيحة.');
+  }
+
+  function evalHtmlStructure(html) {
+    const bodyClose = (html.match(/<\/body>/gi) || []).length;
+    const htmlClose = (html.match(/<\/html>/gi) || []).length;
+    if (bodyClose > 1 || htmlClose > 1) return item('bad', 'صحة كود HTML', 'فيه وسوم إغلاق مكررة.', '</body>\n</html>', 'امسح أي </body> أو </html> زيادة.');
+    return item('good', 'صحة كود HTML', 'سليم.');
+  }
+
+  function evalWhatsappLinks(doc) {
+    const links = Array.from(doc.querySelectorAll('a[href*="wa.me"]'));
+    if (links.length === 0) return item('warning', 'روابط واتساب', 'مفيش رابط واتساب في الصفحة دي.');
+    const bad = links.filter(a => (a.getAttribute('href') || '').includes('wa.me/+'));
+    if (bad.length > 0) return item('bad', 'روابط واتساب', bad.length + ' رابط فيه + غلط.',
+      bad.map(a => 'قديم: ' + a.getAttribute('href') + '\nصح:  ' + a.getAttribute('href').replace('wa.me/+', 'wa.me/')).join('\n\n'));
+    return item('good', 'روابط واتساب', 'كل الروابط (' + links.length + ') صحيحة.');
+  }
+
+  /* ================= بناء الـ HTML ================= */
+
+  function buildScoreHeader(checks) {
+    const total = checks.length;
+    const good = checks.filter(c => c.level === 'good').length;
+    const score = Math.round((good / total) * 100);
+    const cls = score >= 80 ? 'seo-score-good' : score >= 50 ? 'seo-score-mid' : 'seo-score-bad';
+    return '<div class="seo-score-header"><div class="seo-score-circle ' + cls + '">' + score + '%</div>' +
+      '<div><strong style="font-size:16px;">نتيجة فحص الصفحة</strong>' +
+      '<p style="margin:4px 0 0;color:#777;font-size:13px;">' + good + ' من ' + total + ' عنصر سليم</p></div></div>';
+  }
+
+  function buildChecksList(checks) {
+    const iconMap = { good: '✓', warning: '!', bad: '✕' };
+    let html = '', fixId = 0;
+    checks.forEach(c => {
+      html += '<div class="seo-check-item"><div class="seo-check-icon seo-icon-' + c.level + '">' + iconMap[c.level] + '</div>' +
+        '<div style="flex:1;"><strong>' + escapeHtml(c.title) + '</strong><p>' + escapeHtml(c.desc) + '</p>';
+      if (c.fixCode) {
+        const id = 'seo-fix-' + (fixId++);
+        html += '<button type="button" class="seo-fix-btn" data-toggle="' + id + '">✏️ اقترح الإصلاح</button>' +
+          '<div class="seo-fix-box" id="' + id + '"><button type="button" class="seo-fix-copy" data-target="' + id + '-code">نسخ</button>' +
+          '<pre id="' + id + '-code">' + escapeHtml(c.fixCode) + '</pre>' +
+          (c.fixNote ? '<div class="seo-fix-note">💡 ' + escapeHtml(c.fixNote) + '</div>' : '') + '</div>';
+      }
+      html += '</div></div>';
+    });
+    return html;
+  }
+
+  function buildSerpPreview(doc, path) {
+    const title = ((doc.querySelector('title') || {}).textContent || 'بدون عنوان').trim();
+    const metaDesc = doc.querySelector('meta[name="description"]');
+    const desc = metaDesc ? (metaDesc.getAttribute('content') || '').trim() : '';
+    const canonical = doc.querySelector('link[rel="canonical"]');
+    const url = canonical ? canonical.getAttribute('href') : (window.location.origin + path);
+    let hostname; try { hostname = new URL(url).hostname; } catch (e) { hostname = url; }
+
+    const displayTitle = title.length > 60 ? title.slice(0, 57) + '…' : title;
+    const displayDesc = desc
+      ? (desc.length > 155 ? desc.slice(0, 152) + '…' : desc)
+      : 'مفيش meta description، جوجل هياخد جملة من المحتوى تلقائيًا.';
+
+    return '<div class="serp-preview-box"><div class="serp-preview-label">🔍 كده هيبان في نتائج بحث جوجل تقريبًا</div>' +
+      '<div class="serp-preview-frame"><div class="serp-preview-url-row">' +
+      '<div class="serp-preview-favicon">ر</div><div><div class="serp-preview-site">رواد الظل</div>' +
+      '<div class="serp-preview-url">' + escapeHtml(hostname) + '</div></div></div>' +
+      '<div class="serp-preview-title">' + escapeHtml(displayTitle) + '</div>' +
+      '<div class="serp-preview-desc">' + escapeHtml(displayDesc) + '</div></div>' +
+      '<div class="serp-preview-mobile-note">ملحوظة: ده تقريبي، جوجل ممكن يغيّر الشكل تلقائيًا حسب كلمة البحث.</div></div>';
+  }
+
+  function buildKeywordSection(path) {
+    return '<div class="kw-box" id="kwSection">' +
+      '<h3>🎯 كلمات البحث المستهدفة</h3>' +
+      '<p class="kw-sub">اكتب أي كلمة وهي هتتحول تلقائي لمجموعة كلمات بحث مشابهة تغطي كل خدمات الشركة (شماسي / أنظمة تظليل / سواتر / حدادة فنية / منشآت معدنية / كريتال وفورجيه / بوابات حديد / أثاث معدني) في طنطا والغربية ومصر.</p>' +
+      '<div class="kw-input-row"><input type="text" id="kwNewInput" placeholder="مثال: مظلات حدائق">' +
+      '<button type="button" id="kwAddBtn">إضافة</button></div>' +
+      '<div class="kw-note" id="kwNote" style="display:none;"></div>' +
+      '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">' +
+      '<button type="button" class="seo-fix-btn" id="kwSuggestBtn">✨ اقترح كلمات من نفس المجال</button>' +
+      '<button type="button" class="seo-fix-btn" id="kwImportBtn">📥 استورد كلمات من الصفحات والمقالات</button>' +
+      '</div>' +
+      '<div class="kw-chip-list" id="kwChipList"></div>' +
+      '<button type="button" class="seo-fix-btn" id="kwCheckBtn" style="background:#2fb344;color:#fff;border:none;">فحص وجود الكلمات في الصفحة</button>' +
+      '<div id="kwResultsArea"></div></div>';
+  }
+
+  function errorBox(msg) {
+    return '<div class="seo-check-item"><div class="seo-check-icon seo-icon-bad">!</div><div><strong>خطأ</strong><p>' + escapeHtml(msg) + '</p></div></div>';
+  }
+
+  /* ================= ربط الأزرار ================= */
+
+  function bindFixButtons() {
+    resultsBox.querySelectorAll('.seo-fix-btn[data-toggle]').forEach(btn => {
+      if (btn.dataset.bound) return; // منع الربط المزدوج لو الدالة دي اتنادت أكتر من مرة
+      btn.dataset.bound = '1';
+      btn.addEventListener('click', function () {
+        document.getElementById(this.dataset.toggle).classList.toggle('open');
+      });
+    });
+    resultsBox.querySelectorAll('.seo-fix-copy').forEach(btn => {
+      if (btn.dataset.bound) return;
+      btn.dataset.bound = '1';
+      btn.addEventListener('click', function () {
+        const codeEl = document.getElementById(this.dataset.target);
+        navigator.clipboard.writeText(codeEl.textContent).then(() => {
+          const old = this.textContent;
+          this.textContent = 'اتنسخ ✓';
+          setTimeout(() => { this.textContent = old; }, 1500);
+        });
+      });
+    });
+  }
+
+  function bindKeywordSection(path, doc) {
+    document.getElementById('kwAddBtn').addEventListener('click', function () {
+      const input = document.getElementById('kwNewInput');
+      const val = input.value.trim();
+      if (!val) return;
+
+      // بدل ما نضيف الكلمة اللي إنت كاتبها بس، بنولّد منها كلمات
+      // مشابهة عالية القيمة بضم كل خدمات الشركة والمواقع والصيغ
+      // الشائعة، ونضيفهم كلهم مرة واحدة.
+      const expanded = expandKeyword(val);
+
+      const list = getKeywords(path);
+      expanded.forEach(k => { if (!list.includes(k)) list.push(k); });
+      saveKeywords(path, list);
+      input.value = '';
+      renderChips(path);
+      showKwNote(expanded.length + ' كلمة اتضافت (الكلمة اللي كتبتها + كلمات مشابهة من كل الخدمات).');
+    });
+    document.getElementById('kwNewInput').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') document.getElementById('kwAddBtn').click();
+    });
+    document.getElementById('kwSuggestBtn').addEventListener('click', function () {
+      const list = getKeywords(path);
+      generateSuggestions(doc, path).forEach(s => { if (!list.includes(s)) list.push(s); });
+      generateCompanySuggestions().forEach(s => { if (!list.includes(s)) list.push(s); });
+      saveKeywords(path, list);
+      renderChips(path);
+    });
+    document.getElementById('kwImportBtn').addEventListener('click', function () {
+      importFromSiteAndArticles(path);
+    });
+    document.getElementById('kwCheckBtn').addEventListener('click', function () {
+      renderKeywordCheck(path, doc);
+    });
+  }
+
+  function showKwNote(msg) {
+    const note = document.getElementById('kwNote');
+    if (!note) return;
+    note.textContent = msg;
+    note.style.display = 'block';
+    clearTimeout(showKwNote._t);
+    showKwNote._t = setTimeout(() => { note.style.display = 'none'; }, 3500);
+  }
+
+  /* =========================================================
+     الكلمات المفتاحية — مبنية على مجالات الشركة الحقيقية:
+     شماسي / أنظمة تظليل / حدادة فنية / منشآت معدنية / كريتال
+     وفورجيه / سواتر / بوابات حديد — في مصر (طنطا والغربية
+     كنقطة انطلاق، وأيضاً صيغ عامة لمصر كلها).
+  ========================================================= */
+
+  // كل صفحة مربوطة بالخدمة الأساسية بتاعتها (تتوافق مع أقسام
+  // "أعمالنا" و"خدماتنا" و"مجالات أعمالنا" في لوحة التحكم)
+  const PAGE_SERVICE_MAP = {
+    shamasy:  { ar: 'شماسي',            alt: ['أنظمة تظليل', 'مظلات شماسي'] },
+    sawatir:  { ar: 'سواتر',            alt: ['سواتر حديد', 'أسوار خصوصية'] },
+    athath:   { ar: 'أثاث معدني',        alt: ['حدادة أثاث', 'أثاث حديد'] },
+    kretal:   { ar: 'كريتال وفورجيه',    alt: ['شبابيك كريتال', 'أبواب فورجيه'] },
+    manshaat: { ar: 'منشآت معدنية',      alt: ['هناجر معدنية', 'هياكل حديد'] },
+    store:    { ar: 'منتجات حدادة وتظليل', alt: ['متجر مظلات وسواتر'] },
+  };
+
+  const LOCATIONS = ['طنطا', 'الغربية', 'مصر'];
+
+  // كل خدمات الشركة — بتتضاف لأي كلمة بحث جديدة تكتبها عشان الكلمة
+  // متتقالش لوحدها وتغطي كل مجالات الشركة.
+  const ALL_SERVICES = [
+    'شماسي', 'أنظمة تظليل', 'سواتر', 'حدادة فنية',
+    'منشآت معدنية', 'كريتال وفورجيه', 'بوابات حديد', 'أثاث معدني',
+  ];
+
+  const MODIFIERS = ['أسعار', 'تركيب', 'أفضل شركة'];
+
+  /* أي كلمة يكتبها المستخدم → مجموعة كلمات بحث مشابهة عالية القيمة:
+     الكلمة نفسها + الكلمة مع كل خدمة من خدمات الشركة + الكلمة مع
+     المواقع + صيغ بحث شائعة (أسعار/تركيب/أفضل شركة/بالقرب مني). */
+  function expandKeyword(word) {
+    const w = word.trim();
+    if (!w) return [];
+
+    const list = [w];
+
+    ALL_SERVICES.forEach(s => {
+      if (!w.includes(s)) list.push(w + ' ' + s);
+    });
+
+    LOCATIONS.forEach(loc => {
+      if (!w.includes(loc)) list.push(w + ' ' + loc);
+    });
+
+    MODIFIERS.forEach(mod => {
+      if (!w.includes(mod)) list.push(mod + ' ' + w);
+    });
+
+    if (!w.includes('بالقرب')) list.push(w + ' بالقرب مني');
+
+    return Array.from(new Set(list));
+  }
+
+  // فallback عام لأي صفحة مش موجودة في الخريطة فوق (زي الرئيسية، من نحن،
+  // خدماتنا العامة، المقالات...) — كلمات على مستوى الشركة كلها، مش
+  // مستخرجة من نص العنوان (لأن نص العنوان بيبقى أسلوبي زي "نحو هياكل
+  // معدنية متينة" وأول كلمة فيه ممكن تطلع "نحو" أو أي كلمة ربط تانية
+  // مالهاش لازمة كـ كلمة بحث).
+  const DEFAULT_SERVICE = { ar: 'مظلات وسواتر ومنشآت معدنية', alt: ['حدادة فنية', 'كريتال وفورجيه', 'بوابات حديد'] };
+
+  function generateSuggestions(doc, path) {
+    const slug = path.replace(/^\//, '').replace('.html', '');
+    const mapped = PAGE_SERVICE_MAP[slug] || (slug === '' || slug === 'index' ? DEFAULT_SERVICE : null) || DEFAULT_SERVICE;
+
+    const service = mapped.ar;
+    const alts = mapped.alt || [];
+
+    const list = [];
+    LOCATIONS.forEach(loc => list.push(service + ' ' + loc));
+    list.push('أسعار ' + service);
+    list.push('تركيب ' + service);
+    list.push('أفضل شركة ' + service + ' في مصر');
+    list.push(service + ' بالقرب مني');
+    alts.forEach(a => list.push(a + ' مصر'));
+
+    // كلمات بوابات حديد دايماً مهمة للشركة حتى لو الصفحة مش عنها مباشرة
+    if (slug !== 'manshaat') list.push('بوابات حديد مصر');
+
+    return Array.from(new Set(list));
+  }
+
+  // كلمات عامة على مستوى الشركة كلها — تتضاف بالزرار "اقترح كلمات تانية"
+  function generateCompanySuggestions() {
+    return [
+      'شركة تظليل وحدادة في مصر',
+      'حدادة فنية طنطا',
+      'منشآت معدنية الغربية',
+      'مظلات وسواتر مصر',
+      'كريتال وفورجيه طنطا',
+      'بوابات حديد فورجيه',
+      'رواد الظل للتظليل والحدادة',
+    ];
+  }
+
+  /* =========================================================
+     استيراد كلمات حقيقية من صفحات الموقع الفعلية + من المقالات
+     (بتستخدم نفس التوكن المحفوظ من تسجيل الدخول في admin.js).
+  ========================================================= */
+
+  const API_BASE = 'https://rowadalthil.com';
+  const TOKEN_KEY = 'rw_admin_token';
+
+  async function importFromSiteAndArticles(path) {
+    const btn = document.getElementById('kwImportBtn');
+    const originalText = btn.textContent;
+    btn.textContent = '... جاري الاستيراد';
+    btn.disabled = true;
+
+    const found = [];
+
+    try {
+      // 1) كل الصفحات المعروفة في قايمة الاختيار فوق (ما عدا "مسار مخصص")
+      const pageOptions = Array.from(pageSelect.options)
+        .map(o => o.value)
+        .filter(v => v && v !== '__custom__');
+
+      for (const p of pageOptions) {
+        try {
+          const res = await fetch(p, { cache: 'no-store' });
+          if (!res.ok) continue;
+          const html = await res.text();
+          const d = new DOMParser().parseFromString(html, 'text/html');
+
+          const title = ((d.querySelector('title') || {}).textContent || '').trim();
+          if (title) found.push(title);
+
+          const h1 = d.querySelector('h1');
+          if (h1 && h1.textContent.trim()) found.push(h1.textContent.trim());
+
+          const metaKw = d.querySelector('meta[name="keywords"]');
+          if (metaKw && metaKw.getAttribute('content')) {
+            metaKw.getAttribute('content').split(',').forEach(k => {
+              if (k.trim()) found.push(k.trim());
+            });
+          }
+        } catch (e) { /* تجاهل الصفحة اللي فشلت وكمّل الباقي */ }
+      }
+
+      // 2) المقالات — كل مقال بيخزن metaKeywords وعنوان لوحده
+      try {
+        const token = localStorage.getItem(TOKEN_KEY);
+        const res = await fetch(API_BASE + '/api/articles?limit=100', {
+          headers: token ? { Authorization: 'Bearer ' + token } : {},
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const articles = Array.isArray(data) ? data : (data.articles || data.data || []);
+          articles.forEach(a => {
+            if (a.title) found.push(a.title.trim());
+            if (a.metaKeywords) {
+              a.metaKeywords.split(',').forEach(k => { if (k.trim()) found.push(k.trim()); });
+            }
+          });
+        }
+      } catch (e) { /* لو المقالات فشلت، نكمل بس بكلمات الصفحات */ }
+
+    } finally {
+      btn.textContent = originalText;
+      btn.disabled = false;
+    }
+
+    // تنظيف: نشيل أي كلمة قصيرة جداً أو مكررة
+    const clean = Array.from(new Set(found.map(s => s.trim()).filter(s => s.length >= 3)));
+
+    if (clean.length === 0) {
+      showKwNote('معرفتش أجيب كلمات من الصفحات أو المقالات (اتأكد إنك مسجل دخول وإن الصفحات شغالة).');
+      return;
+    }
+
+    const list = getKeywords(path);
+    let addedCount = 0;
+    clean.forEach(k => { if (!list.includes(k)) { list.push(k); addedCount++; } });
+    saveKeywords(path, list);
+    renderChips(path);
+    showKwNote(addedCount + ' كلمة جديدة اتضافت من صفحات الموقع والمقالات الحقيقية.');
+  }
+
+  /* ================= تخزين الكلمات ================= */
+
+  function getKeywords(path) {
+    try { return JSON.parse(localStorage.getItem(STORAGE_PREFIX + path) || '[]'); } catch (e) { return []; }
+  }
+  function saveKeywords(path, list) { localStorage.setItem(STORAGE_PREFIX + path, JSON.stringify(list)); }
+
+  function renderChips(path) {
+    const list = getKeywords(path);
+    const box = document.getElementById('kwChipList');
+    if (!box) return;
+    if (list.length === 0) { box.innerHTML = '<span style="color:#aaa;font-size:12.5px;">لسه مفيش كلمات</span>'; return; }
+    box.innerHTML = list.map((kw, i) => '<div class="kw-chip">' + escapeHtml(kw) + '<button type="button" data-i="' + i + '" class="kw-remove">✕</button></div>').join('');
+    box.querySelectorAll('.kw-remove').forEach(btn => {
+      btn.addEventListener('click', function () {
+        const l = getKeywords(path);
+        l.splice(Number(this.dataset.i), 1);
+        saveKeywords(path, l);
+        renderChips(path);
+      });
+    });
+  }
+
+  function renderKeywordCheck(path, doc) {
+    const list = getKeywords(path);
+    const area = document.getElementById('kwResultsArea');
+    if (list.length === 0) { area.innerHTML = '<p style="color:#aaa;font-size:12.5px;margin-top:10px;">ضيف كلمات الأول.</p>'; return; }
+
+    const title = ((doc.querySelector('title') || {}).textContent || '').toLowerCase();
+    const metaDesc = doc.querySelector('meta[name="description"]');
+    const desc = (metaDesc ? metaDesc.getAttribute('content') || '' : '').toLowerCase();
+    const h1 = doc.querySelector('h1');
+    const h1Text = (h1 ? h1.textContent : '').toLowerCase();
+    const bodyText = ((doc.body ? doc.body.innerText || doc.body.textContent : '') || '').toLowerCase();
+    const rawDesc = metaDesc ? (metaDesc.getAttribute('content') || '') : '';
+
+    // بيانات كل زرار "إضافة" بنخزنها هنا (بدل ما نحط الصندوق جوه
+    // عمود ضيق في الجدول ويطلع مقطوع)، وبنعرضها في لوحة واحدة
+    // عريضة تحت الجدول لما المستخدم يدوس عليها.
+    kwFixMap = {};
+    let fixId = 0;
+
+    const rows = list.map(kw => {
+      const k = kw.toLowerCase();
+      const inTitle = title.includes(k);
+      const inH1 = h1Text.includes(k);
+      const inDesc = desc.includes(k);
+      const inBody = bodyText.includes(k);
+      const missingEverywhere = !inTitle && !inH1 && !inDesc && !inBody;
+
+      let addCell = '<span style="color:#ccc;font-size:11px;">—</span>';
+      if (missingEverywhere) {
+        const id = 'kw-fix-' + (fixId++);
+        const suggestion = rawDesc
+          ? rawDesc.replace(/\.\s*$/, '') + '، ' + kw + '.'
+          : 'رواد الظل — ' + kw + '، خدمة احترافية بأعلى جودة في مصر.';
+
+        kwFixMap[id] = { kw, suggestion };
+        addCell = '<button type="button" class="kw-add-btn" data-fix="' + id + '">➕ إضافة</button>';
+      }
+
+      return '<tr><td>' + escapeHtml(kw) + '</td><td>' + badge(inTitle) + '</td><td>' + badge(inH1) +
+        '</td><td>' + badge(inDesc) + '</td><td>' + badge(inBody) + '</td><td>' + addCell + '</td></tr>';
+    }).join('');
+
+    area.innerHTML = '<div style="overflow-x:auto;"><table class="kw-result-table">' +
+      '<thead><tr><th>الكلمة</th><th>Title</th><th>H1</th><th>الوصف</th><th>المحتوى</th><th></th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+      '<p style="font-size:11.5px;color:#999;margin:10px 0;">أي كلمة مش موجودة خالص بيظهر جنبها زرار "إضافة" — دوس عليه وهيطلعلك تحت اقتراح واضح تنسخه وتحطه.</p>' +
+      '<div id="kwAddPanel" class="kw-add-panel" style="display:none;"></div>';
+
+    area.querySelectorAll('.kw-add-btn').forEach(btn => {
+      btn.addEventListener('click', function () {
+        showKwAddPanel(this.dataset.fix);
+      });
+    });
+  }
+
+  let kwFixMap = {};
+
+  function showKwAddPanel(id) {
+    const data = kwFixMap[id];
+    const panel = document.getElementById('kwAddPanel');
+    if (!data || !panel) return;
+
+    panel.style.display = 'block';
+    panel.innerHTML =
+      '<div class="kw-add-panel-title">💡 اقتراح عشان كلمة "' + escapeHtml(data.kw) + '" تبقى موجودة في الصفحة</div>' +
+      '<p class="kw-add-panel-text">الكلمة دي مش موجودة حالياً لا في العنوان ولا الوصف ولا المحتوى. أسهل حل: انسخ الجملة دي وحطها (أو حاجة قريبة منها بأسلوبك) في <b>وصف الصفحة (Meta Description)</b> من نفس مكان تعديل الصفحة أو المقال ده:</p>' +
+      '<div class="kw-add-panel-box"><pre id="kwAddPanelText">' + escapeHtml(data.suggestion) + '</pre>' +
+      '<button type="button" class="kw-add-panel-copy" id="kwAddPanelCopy">نسخ الجملة</button></div>' +
+      '<p class="kw-add-panel-note">راجع الجملة وعدّلها بأسلوبك الطبيعي قبل ما تحفظها — الهدف إنها تتقرا كويس مش بس فيها الكلمة.</p>';
+
+    document.getElementById('kwAddPanelCopy').addEventListener('click', function () {
+      navigator.clipboard.writeText(data.suggestion).then(() => {
+        const old = this.textContent;
+        this.textContent = 'اتنسخ ✓';
+        setTimeout(() => { this.textContent = old; }, 1500);
+      });
+    });
+
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function badge(ok) { return ok ? '<span class="kw-badge kw-badge-yes">موجودة</span>' : '<span class="kw-badge kw-badge-no">مش موجودة</span>'; }
+
+  function escapeHtml(str) { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+
+  /* =========================================================
+     تنسيق ذاتي — بيتحط مرة واحدة بس في <head>، ومستقل تماماً عن
+     admin.css. الهدف إن أداة الفحص تفضل شكلها ثابت وحلو حتى لو
+     ملف admin.css اتقفل في كاش المتصفح أو اتأخر تحديثه على السيرفر.
+  ========================================================= */
+  function injectStyles() {
+    if (document.getElementById('seoInlineStyles')) return;
+
+    const style = document.createElement('style');
+    style.id = 'seoInlineStyles';
+    style.textContent = `
+      #seoCheckResults{ direction:rtl; text-align:right; font-family:"Cairo",Tahoma,Arial,sans-serif; }
+
+      #seoCheckResults .serp-preview-box{
+        background:#fff; border:1px solid #eee; border-radius:12px;
+        padding:20px 22px; margin-bottom:20px;
+      }
+      #seoCheckResults .serp-preview-label{
+        font-size:12px; font-weight:700; color:#888; margin-bottom:14px;
+        display:flex; align-items:center; gap:6px;
+      }
+      #seoCheckResults .serp-preview-frame{ direction:rtl; text-align:right; max-width:600px; }
+      #seoCheckResults .serp-preview-url-row{
+        display:flex !important; flex-direction:row-reverse; align-items:center;
+        gap:10px; margin-bottom:6px;
+      }
+      #seoCheckResults .serp-preview-favicon{
+        width:28px; height:28px; min-width:28px; border-radius:50%;
+        background:linear-gradient(135deg,#1a73e8,#174ea6);
+        display:flex; align-items:center; justify-content:center;
+        font-size:13px; color:#fff; font-weight:800; flex-shrink:0;
+      }
+      #seoCheckResults .serp-preview-site{ font-size:14px; color:#202124; font-weight:600; }
+      #seoCheckResults .serp-preview-url{ font-size:12.5px; color:#4d5156; direction:ltr; display:inline-block; }
+      #seoCheckResults .serp-preview-title{ font-size:20px; color:#1a0dab; line-height:1.4; margin:4px 0 5px; font-weight:400; }
+      #seoCheckResults .serp-preview-desc{ font-size:14.5px; color:#4d5156; line-height:1.65; }
+      #seoCheckResults .serp-preview-mobile-note{
+        font-size:11.5px; color:#999; margin-top:14px; padding-top:12px; border-top:1px dashed #eee;
+      }
+
+      #seoCheckResults .seo-score-header{
+        display:flex; align-items:center; gap:20px; background:#fff;
+        border:1px solid #eee; border-radius:12px; padding:22px; margin-bottom:20px;
+      }
+      #seoCheckResults .seo-score-circle{
+        width:80px; height:80px; min-width:80px; border-radius:50%;
+        display:flex; align-items:center; justify-content:center;
+        font-size:24px; font-weight:800; color:#fff;
+      }
+      #seoCheckResults .seo-score-good{ background:#2fb344; }
+      #seoCheckResults .seo-score-mid{ background:#e0a800; }
+      #seoCheckResults .seo-score-bad{ background:#d64545; }
+
+      #seoCheckResults .seo-check-item{
+        display:flex; align-items:flex-start; gap:12px; background:#fff;
+        border:1px solid #eee; border-radius:10px; padding:14px 16px; margin-bottom:10px;
+      }
+      #seoCheckResults .seo-check-icon{
+        width:24px; height:24px; min-width:24px; border-radius:50%;
+        display:flex; align-items:center; justify-content:center; flex-shrink:0;
+        font-size:13px; color:#fff; margin-top:2px;
+      }
+      #seoCheckResults .seo-icon-good{ background:#2fb344; }
+      #seoCheckResults .seo-icon-warning{ background:#e0a800; }
+      #seoCheckResults .seo-icon-bad{ background:#d64545; }
+      #seoCheckResults .seo-check-item strong{ display:block; font-size:14px; margin-bottom:3px; }
+      #seoCheckResults .seo-check-item p{ margin:0; font-size:12.5px; color:#777; line-height:1.7; }
+
+      #seoCheckResults .seo-fix-btn{
+        margin-top:10px; background:#f0f4ff; border:1px solid #c7d2fe; color:#3b4ec2;
+        font-size:12.5px; font-weight:700; padding:6px 12px; border-radius:6px;
+        cursor:pointer; font-family:"Cairo",sans-serif;
+      }
+      #seoCheckResults .seo-fix-btn:hover{ background:#e2e8ff; }
+      #seoCheckResults .seo-fix-box{ display:none; margin-top:10px; background:#1e1e2e; border-radius:8px; padding:12px 14px; position:relative; }
+      #seoCheckResults .seo-fix-box.open{ display:block; }
+      #seoCheckResults .seo-fix-box pre{
+        margin:0; color:#d4d4d4; font-size:12.5px; white-space:pre-wrap;
+        word-break:break-all; direction:ltr; text-align:left; font-family:monospace;
+        padding-top:26px;
+      }
+      #seoCheckResults .seo-fix-copy{
+        position:absolute; top:8px; left:8px; background:#3b4ec2; color:#fff;
+        border:none; border-radius:5px; font-size:11px; padding:4px 8px;
+        cursor:pointer; font-family:"Cairo",sans-serif;
+      }
+
+      #seoCheckResults .kw-box{ background:#fff; border:1px solid #eee; border-radius:12px; padding:20px 22px; margin-bottom:20px; }
+      #seoCheckResults .kw-box h3{ margin:0 0 4px; font-size:15px; }
+      #seoCheckResults .kw-sub{ font-size:12.5px; color:#888; margin:0 0 16px; line-height:1.7; }
+      #seoCheckResults .kw-note{
+        background:#eafff0; color:#159447; border:1px solid #cdf1d9; border-radius:8px;
+        padding:8px 12px; font-size:12px; font-weight:700; margin-bottom:12px;
+      }
+      #seoCheckResults .kw-input-row{ display:flex; gap:8px; margin-bottom:14px; }
+      #seoCheckResults .kw-input-row input{
+        flex:1; padding:9px 12px; border:1px solid #ddd; border-radius:8px;
+        font-family:"Cairo",sans-serif; font-size:13.5px;
+      }
+      #seoCheckResults .kw-input-row button{
+        background:#3b4ec2; color:#fff; border:none; border-radius:8px; padding:9px 16px;
+        font-size:13px; font-weight:700; cursor:pointer; font-family:"Cairo",sans-serif; white-space:nowrap;
+      }
+      #seoCheckResults .kw-chip-list{ display:flex !important; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+      #seoCheckResults .kw-chip{
+        background:#f4f5f9; border-radius:20px; padding:6px 14px; font-size:12.5px;
+        display:flex !important; align-items:center; gap:8px; white-space:nowrap;
+      }
+      #seoCheckResults .kw-chip button{
+        background:none; border:none; color:#999; cursor:pointer; font-size:13px; padding:0; line-height:1;
+      }
+      #seoCheckResults .kw-chip button:hover{ color:#d64545; }
+      #seoCheckResults .kw-result-table{ width:100%; border-collapse:collapse; margin-top:14px; font-size:13px; }
+      #seoCheckResults .kw-result-table th,
+      #seoCheckResults .kw-result-table td{ text-align:right; padding:8px 6px; border-bottom:1px solid #f0f0f0; }
+      #seoCheckResults .kw-result-table th{ color:#888; font-size:11.5px; font-weight:700; }
+      #seoCheckResults .kw-badge{ display:inline-block; padding:2px 10px; border-radius:12px; font-size:11px; font-weight:700; }
+      #seoCheckResults .kw-badge-yes{ background:#e6f7e9; color:#2fb344; }
+      #seoCheckResults .kw-badge-no{ background:#fdeaea; color:#d64545; }
+
+      #seoCheckResults .kw-add-btn{
+        background:#f0f4ff; border:1px solid #c7d2fe; color:#3b4ec2;
+        font-size:11.5px; font-weight:700; padding:5px 10px; border-radius:6px;
+        cursor:pointer; font-family:"Cairo",sans-serif; white-space:nowrap;
+      }
+      #seoCheckResults .kw-add-btn:hover{ background:#e2e8ff; }
+
+      #seoCheckResults .kw-add-panel{
+        margin-top:16px; background:#f7f8ff; border:1px solid #dbe1ff;
+        border-radius:12px; padding:18px 20px;
+      }
+      #seoCheckResults .kw-add-panel-title{ font-size:14px; font-weight:800; color:#2b3a8f; margin-bottom:8px; }
+      #seoCheckResults .kw-add-panel-text{ font-size:13px; color:#444; line-height:1.9; margin:0 0 12px; }
+      #seoCheckResults .kw-add-panel-box{
+        background:#1e1e2e; border-radius:8px; padding:14px 16px 44px; position:relative; margin-bottom:10px;
+      }
+      #seoCheckResults .kw-add-panel-box pre{
+        margin:0; color:#e6e6e6; font-size:13px; white-space:pre-wrap; word-break:break-word;
+        direction:rtl; text-align:right; font-family:"Cairo",sans-serif; line-height:1.8;
+      }
+      #seoCheckResults .kw-add-panel-copy{
+        position:absolute; bottom:12px; left:14px; background:#3b4ec2; color:#fff;
+        border:none; border-radius:6px; font-size:12px; padding:6px 14px;
+        cursor:pointer; font-family:"Cairo",sans-serif; font-weight:700;
+      }
+      #seoCheckResults .kw-add-panel-note{ font-size:11.5px; color:#888; margin:0; line-height:1.7; }
+
+      #seoCheckResults .seo-loading{ text-align:center; padding:40px; color:#999; }
+    `;
+    document.head.appendChild(style);
+  }
+
+})();
+</script>
 <script src="admin.js"></script>
 </body>
 </html>
