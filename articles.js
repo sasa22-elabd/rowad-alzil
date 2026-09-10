@@ -33,7 +33,10 @@
       // نعرض المنشور بس على الموقع
       articles = list.filter((a) => (a.published === undefined ? true : !!a.published));
 
-      if (!articles.length) return; // سيبها على الكروت الثابتة الموجودة في الهتمل
+      if (!articles.length) {
+  slider.innerHTML = `<p style="text-align:center;color:#999;padding:40px 0;">لا توجد مقالات حالياً</p>`;
+  return;
+}
 
       centerIndex = 0;
       renderSlider();

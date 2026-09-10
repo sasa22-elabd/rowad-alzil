@@ -86,14 +86,59 @@ app.use('/api', applySeoRoute);
 // public/uploads/image.jpg
 // تصبح:
 // https://rowadalthil.com/uploads/image.jpg
+app.get("/sitemap.xml", async (req, res) => {
+  try {
+    const { Product, Article, Category, WorkSection } = require("./models");
+    const [products, articles, categories, sections] = await Promise.all([
+      Product.findAll({ attributes: ["id", "updatedAt"] }),
+      Article.findAll({ where: { published: true }, attributes: ["slug", "updatedAt"] }),
+      Category.findAll({ attributes: ["id", "updatedAt"] }),
+      WorkSection.findAll({ where: { isActive: true }, attributes: ["slug", "updatedAt"] }),
+    ]);
+    const base = "https://rowadalthil.com";
+    const staticPages = ["/", "/about.html", "/services.html", "/categories.html", "/store.html", "/articles-list.html"];
+    let urls = staticPages.map((p) => `<url><loc>${base}${p}</loc></url>`);
+    articles.forEach((a) => urls.push(`<url><loc>${base}/article.html?slug=${a.slug}</loc><lastmod>${a.updatedAt.toISOString()}</lastmod></url>`));
+    sections.forEach((s) => urls.push(`<url><loc>${base}/work/${s.slug}</loc><lastmod>${s.updatedAt.toISOString()}</lastmod></url>`));
+    res.header("Content-Type", "application/xml");
+    res.send(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.join("")}</urlset>`);
+  } catch (err) {
+    res.status(500).send("Error generating sitemap");
+  }
+});
+const UPLOADS_DIR = process.env.UPLOADS_DIR || path.join(__dirname, "public", "uploads");
 
-app.use(
-  "/uploads",
-  express.static(
-    path.join(__dirname, "public", "uploads")
-  )
-);
+app.use("/uploads", express.static(UPLOADS_DIR));
+app.get("/sitemap.xml", async (req, res) => {
+  try {
+    const { Product, Article, Category, WorkSection } = require("./models");
 
+    const [products, articles, categories, sections] = await Promise.all([
+      Product.findAll({ attributes: ["id", "updatedAt"] }),
+      Article.findAll({ where: { published: true }, attributes: ["slug", "updatedAt"] }),
+      Category.findAll({ attributes: ["id", "updatedAt"] }),
+      WorkSection.findAll({ where: { isActive: true }, attributes: ["slug", "updatedAt"] }),
+    ]);
+
+    const base = "https://rowadalthil.com";
+    const staticPages = ["/", "/about.html", "/services.html", "/categories.html", "/store.html", "/articles-list.html"];
+
+    let urls = staticPages.map((p) => `<url><loc>${base}${p}</loc></url>`);
+
+    articles.forEach((a) => {
+      urls.push(`<url><loc>${base}/article.html?slug=${a.slug}</loc><lastmod>${a.updatedAt.toISOString()}</lastmod></url>`);
+    });
+
+    sections.forEach((s) => {
+      urls.push(`<url><loc>${base}/work/${s.slug}</loc><lastmod>${s.updatedAt.toISOString()}</lastmod></url>`);
+    });
+
+    res.header("Content-Type", "application/xml");
+    res.send(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.join("")}</urlset>`);
+  } catch (err) {
+    res.status(500).send("Error generating sitemap");
+  }
+});
 // =========================
 // Static Files
 // =========================
@@ -103,32 +148,18 @@ app.use(
 // =========================
 
 const staticOptions = {
-  maxAge: "30d",
   etag: true,
   lastModified: true,
   setHeaders: (res, filePath) => {
-    // Cache للصور والخطوط والملفات الثابتة
-    if (
-      /\.(jpg|jpeg|png|webp|avif|gif|svg|ico|woff|woff2|ttf|otf)$/i.test(
-        filePath
-      )
-    ) {
-      res.setHeader(
-        "Cache-Control",
-        "public, max-age=2592000, immutable"
-      );
-    }
-
-    // Cache للـ CSS و JS
-    if (/\.(css|js)$/i.test(filePath)) {
-      res.setHeader(
-        "Cache-Control",
-        "public, max-age=2592000"
-      );
+    if (/\.(jpg|jpeg|png|webp|avif|gif|svg|ico|woff|woff2|ttf|otf)$/i.test(filePath)) {
+      res.setHeader("Cache-Control", "public, max-age=2592000, immutable");
+    } else if (/\.(css|js)$/i.test(filePath)) {
+      res.setHeader("Cache-Control", "public, max-age=2592000");
+    } else if (/\.html$/i.test(filePath)) {
+      res.setHeader("Cache-Control", "no-cache, must-revalidate");
     }
   }
 };
-
 // public/
 app.use(
   express.static(

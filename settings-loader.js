@@ -1,106 +1,97 @@
 /* =========================================================
    رواد الظل | settings-loader.js
-   تحميل إعدادات الموقع العامة من GET /api/settings وتطبيقها
+   بيجيب إعدادات الموقع (اللوجو، الاسم، بيانات التواصل، السوشيال)
+   من /api/settings ويحدّثها تلقائيًا في أي صفحة فيها العناصر دي:
 
-     - نص عادي:      <span data-settings="phone"></span>
-     - رابط بادئة:   <a data-settings-href="tel:phoneIntl"></a>
-     - رابط مباشر:   <a data-settings-href="link:instagram"></a>
-     - لوجو داخلي:   <img data-settings-logo src="images/logo.png">
-     - Favicon:      <link data-settings-favicon href="images/favicon.png">
-     - صورة مشاركة:  <meta data-settings-og-image content="...">
+   - <img data-settings-logo>                  → اللوجو الداخلي
+   - <link data-settings-favicon>               → اللوجو الخارجي/الأيقونة
+   - <meta property="og:image" data-settings-og-image> → صورة المشاركة
+   - <* data-settings="siteName">                → أي نص (siteName, siteNameEn, phone, email, address...)
+   - <a data-settings-href="tel:phoneIntl">       → روابط تتغيّر (tel:, mailto:, link:facebook...)
+
+   بعد ما يخلص تحميل، بيبعت حدث "rw:settings-loaded" لأي كود تاني
+   محتاج يستخدم نفس البيانات (زي تحديث الـ JSON-LD في index.html).
 ========================================================= */
 
 (function () {
   "use strict";
 
+  const API_BASE = window.RW_API_BASE || "";
+
   function resolveImage(path) {
     if (!path) return "";
     if (/^https?:\/\//i.test(path)) return path;
-    return "/uploads/" + path.replace(/^\/?(uploads\/)?/, "");
+    return API_BASE + "/uploads/" + path.replace(/^\/?(uploads\/)?/, "");
   }
 
-  function normalizeSettings(data) {
-    if (Array.isArray(data)) {
-      return data.reduce((acc, item) => {
-        if (item && item.key !== undefined) acc[item.key] = item.value;
-        return acc;
-      }, {});
+  async function loadSettings() {
+    let data;
+
+    try {
+      const res = await fetch(API_BASE + "/api/settings", { cache: "no-store" });
+      if (!res.ok) return;
+      data = await res.json();
+    } catch (err) {
+      console.error("تعذر تحميل إعدادات الموقع:", err);
+      return;
     }
-    return data.settings || data.data || data || {};
-  }
 
-  function applySettings(settings) {
+    if (!data) return;
 
-    // 1) نص عادي
+    window.RW_SETTINGS = data;
+
+    /* اللوجو الداخلي (هيدر / فوتر) */
+    if (data.logo) {
+      const logoUrl = resolveImage(data.logo);
+      document.querySelectorAll("[data-settings-logo]").forEach((img) => {
+        img.src = logoUrl;
+      });
+    }
+
+    /* اللوجو الخارجي (Favicon + مشاركة السوشيال) */
+    const externalLogo = data.logoExternal || data.logo;
+    if (externalLogo) {
+      const externalUrl = resolveImage(externalLogo);
+
+      document.querySelectorAll("[data-settings-favicon]").forEach((link) => {
+        link.href = externalUrl;
+      });
+
+      document.querySelectorAll("[data-settings-og-image]").forEach((meta) => {
+        meta.setAttribute("content", externalUrl);
+      });
+    }
+
+    /* النصوص (اسم الموقع، الهاتف، الإيميل، العنوان...) */
     document.querySelectorAll("[data-settings]").forEach((el) => {
       const key = el.getAttribute("data-settings");
-      const value = settings[key];
-      if (value !== undefined && value !== null && value !== "") {
-        el.textContent = value;
+      if (data[key] !== undefined && data[key] !== null && data[key] !== "") {
+        el.textContent = data[key];
       }
     });
 
-    // 2) روابط
+    /* الروابط اللي بتتغيّر (tel: / mailto: / السوشيال ميديا) */
     document.querySelectorAll("[data-settings-href]").forEach((el) => {
-      const spec = el.getAttribute("data-settings-href");
-      const [type, key] = spec.split(":");
-      const value = settings[key];
+      const spec = el.getAttribute("data-settings-href"); // مثال: "tel:phoneIntl" أو "link:facebook"
+      const [prefix, key] = spec.split(":");
+      if (!data[key]) return;
 
-      if (value === undefined || value === null || value === "") return;
-
-      if (type === "link") {
-        el.setAttribute("href", value);
-      } else {
-        el.setAttribute("href", type + ":" + value);
+      if (prefix === "tel") {
+        el.setAttribute("href", "tel:" + data[key]);
+      } else if (prefix === "mailto") {
+        el.setAttribute("href", "mailto:" + data[key]);
+      } else if (prefix === "link") {
+        el.setAttribute("href", data[key]);
       }
     });
 
-    // 3) اللوجو الداخلي
-    document.querySelectorAll("[data-settings-logo]").forEach((el) => {
-      if (settings.logo) {
-        el.setAttribute("src", resolveImage(settings.logo));
-      }
-    });
-
-    // 4) اللوجو الخارجي: Favicon + صورة المشاركة (og:image / twitter:image)
-    if (settings.logoExternal) {
-      const externalLogoUrl = resolveImage(settings.logoExternal);
-
-      document.querySelectorAll("[data-settings-favicon]").forEach((el) => {
-        el.setAttribute("href", externalLogoUrl);
-      });
-
-      document.querySelectorAll("[data-settings-og-image]").forEach((el) => {
-        el.setAttribute("content", externalLogoUrl);
-      });
-    }
-  }
-
-  async function loadSiteSettings() {
-    try {
-      const res = await fetch("/api/settings");
-
-      if (!res.ok) {
-        throw new Error("HTTP " + res.status);
-      }
-
-      const data = await res.json();
-      const settings = normalizeSettings(data);
-
-      window.RW_SETTINGS = settings;
-      applySettings(settings);
-
-      document.dispatchEvent(
-        new CustomEvent("rw:settings-loaded", { detail: settings })
-      );
-    } catch (err) {
-      console.error("تعذر تحميل الإعدادات:", err);
-    }
+    /* بعد ما نخلص، بلّغ أي كود تاني محتاج نفس البيانات */
+    document.dispatchEvent(new CustomEvent("rw:settings-loaded", { detail: data }));
   }
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", loadSiteSettings);
+    document.addEventListener("DOMContentLoaded", loadSettings);
   } else {
-    loadSiteSettings();
+    loadSettings();
   }
 })();

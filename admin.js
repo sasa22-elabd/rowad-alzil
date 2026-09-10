@@ -298,7 +298,7 @@
     if (el.loginScreen) el.loginScreen.style.display = "flex";
     if (el.dashboard) el.dashboard.style.display = "none";
   }
-  function showDashboard() {
+function showDashboard() {
     if (el.loginScreen) el.loginScreen.style.display = "none";
     if (el.dashboard) el.dashboard.style.display = "flex";
 
@@ -309,9 +309,10 @@
     loadHeroSlides();
     loadOrders(1);
     loadWorkSections();
+    loadSettings();
     initPush();
     updateOrdersBadge();
-  }
+}
 
   if (el.loginForm) {
     el.loginForm.addEventListener("submit", async function (e) {
